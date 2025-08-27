@@ -3,8 +3,9 @@
 DWORD WINAPI Setup( LPVOID instance ) {
 	try {
 		g_memory.init( );
-		g_gui.Setup( );
+		g_gui.init( );
 		g_hooks.init( );
+		g_Vars.Create( );
 	}
 	catch ( const std::exception& error ) {
 		MessageBeep( MB_ICONERROR );

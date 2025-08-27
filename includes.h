@@ -11,4 +11,5 @@
 #include "gui.h"
 #include "memory.h"
 #include "config.h"
+#include "variables.h"
 #include "dependencies/include/xorstr.h"

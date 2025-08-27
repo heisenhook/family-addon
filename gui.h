@@ -1,8 +1,14 @@
 #pragma once
 #include <d3d9.h>
+#include "dependencies/include/imgui/imgui.h"
+#include "dependencies/include/imgui/imgui_impl_win32.h"
+#include "dependencies/include/imgui/imgui_impl_dx9.h"
 
 class Gui {
 public:
+	/* Prototypes */
+
+
 	bool open = true;
 	bool setup = false;
 	int selected_tab;

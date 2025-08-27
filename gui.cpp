@@ -1,4 +1,6 @@
+#include "includes.h"
 #include "gui.h"
+#include "config.h"
 
 #include "dependencies/include/imgui/imgui.h"
 #include "dependencies/include/imgui/imgui_impl_win32.h"
@@ -146,6 +148,16 @@ void Gui::Destroy( ) noexcept {
 	DestroyDirectX( );
 }
 
+// callback that allows ImGui to resize the std::string automatically
+static int InputTextCallback( ImGuiInputTextCallbackData* data ) {
+    if ( data->EventFlag == ImGuiInputTextFlags_CallbackResize ) {
+        auto str = reinterpret_cast< std::string* >( data->UserData );
+        str->resize( data->BufTextLen );
+        data->Buf = str->data( );
+    }
+    return 0;
+}
+
 void Gui::Render( ) noexcept {
 	ImGui_ImplDX9_NewFrame( );
 	ImGui_ImplWin32_NewFrame( );
@@ -163,7 +175,7 @@ void Gui::Render( ) noexcept {
 	ImGui::NewFrame( );
 	ImGui::SetNextWindowSize( ImVec2( 600, 400 ) );
 
-	ImGui::Begin( "hack", &open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse);
+	ImGui::Begin( "hack", &open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize );
 
 	ImGui::BeginChild( "tabs", ImVec2{ 150, 0 }, true );
 	{
@@ -178,60 +190,40 @@ void Gui::Render( ) noexcept {
 	ImGui::EndChild( );
 
     if ( selected_tab == 0 ) {
+        CVariables::RAGE* rage = nullptr; // todo: add in weapon check functionality
+
         ImGui::SetNextWindowPos( calculateChildWindowPosition( 0, 1 ) );
         ImGui::BeginChild( "Aimbot", childSize( 0, 1, 1.f ), true );
         {
-            /*
-            ImGui::BeginTabBar("Settings#left_tabs_bar");
 
-            // ericb 2017_07_21 : draw the tabs background BEFORE to fill it, to avoid a "colored overlay"
-            ImGui::DrawTabsBackground();
+            struct MultiItem_t {
+                std::string name;
+                bool* value;
+            };
 
-            if (ImGui::AddTab("General")) {
-                bool fullscreen = mGUICfg->fullScreen.value;
-                if (ImGui::Checkbox("Fullscreen Mode", &fullscreen)) {
-                    mGUICfg->toggleFullscreenMode = true;
-                }
-                if (ImGui::Checkbox("Enable Multisampling", &mGUICfg->enableMultisampling.value)) {
-                    mGUICfg->settingsChanged = true;
-                }
+            std::vector<MultiItem_t> hitboxes {
+                { "Head", &rage->hitbox_head },
+                { "Chest", &rage->hitbox_chest },
+                { "Body", &rage->hitbox_body },
+                { "Arms", &rage->hitbox_arms },
+                { "Thighs", &rage->hitbox_thighs },
+                { "Calfs", &rage->hitbox_calfs },
+                { "Feet", &rage->hitbox_feet },
+            };
 
-                if (ImGui::SliderInt("MSAA Count", (int*)&mGUICfg->multisampleCount.value, mGUICfg->multisampleCount.lowerLimit, mGUICfg->multisampleCount.upperLimit))
-                    mGUICfg->settingsChanged = true;
-            }
-            if (ImGui::AddTab("GUI")) {
-                ImGui::Text("Tab 2");
-            }
-            if (ImGui::AddTab("Tab Name")) {
-                ImGui::Text("Tab 3");
-            }
-            if (ImGui::AddTab("Tab Name")) {
-                ImGui::Text("Tab 4");
-            }
-            ImGui::EndTabBar();
+            std::vector<MultiItem_t> multipoints{
+                {"Head", &rage->multipoint_head },
+                {"Chest", &rage->multipoint_chest },
+                {"Body", &rage->multipoint_body },
+                {"Arms", &rage->multipoint_arms },
+                {"Thighs", &rage->multipoint_thighs },
+                {"Calfs", &rage->multipoint_calfs },
+                {"Feet", &rage->multipoint_feet },
+            };
 
-            ImGui::Dummy(ImVec2(0, 20));
+            ImGui::Checkbox( "Override default config", &rage->override_default_config);
+            //ImGui::MultiSelect( "Hitboxes", )
 
-            ImGui::BeginTabBar("#Additional Parameters");
-            float value = 0.0f;
-
-            // ericb 2017_07_21 : draw the tabs background BEFORE to fill it, to avoid a "colored overlay"
-            ImGui::DrawTabsBackground();
-
-            if (ImGui::AddTab("Tab Name2")) {
-                ImGui::SliderFloat("Slider", &value, 0, 1.0f);
-            }
-            if (ImGui::AddTab("Tab Name3")) {
-                ImGui::Text("Tab 2");
-            }
-            if (ImGui::AddTab("Tab Name4")) {
-                ImGui::Text("Tab 3");
-            }
-            if (ImGui::AddTab("Tab Name5")) {
-                ImGui::Text("Tab 4");
-            }
-            ImGui::EndTabBar();
-            */
 
         }
         ImGui::EndChild( );
@@ -275,11 +267,6 @@ void Gui::Render( ) noexcept {
         ImGui::SetNextWindowPos( calculateChildWindowPosition( 0, 1 ) );
         ImGui::BeginChild( "Players", childSize( 0, 1, 1.f ), true );
         {
-            ImGui::Checkbox( "Bounding Box", &g_config->b[ _( "esp_bounding_box" ) ] );
-            ImGui::Checkbox( "Name", &g_config->b[ _( "esp_name" ) ] );
-            ImGui::Checkbox( "Health bar", &g_config->b[ _( "esp_health_bar" ) ] );
-            ImGui::Checkbox( "Weapon Name", &g_config->b[ _( "esp_wpn_name" ) ] );
-            ImGui::Checkbox( "Weapon Icon", &g_config->b[ _( "esp_wpn_icon" ) ] );
 
         }
         ImGui::EndChild( );
@@ -287,10 +274,7 @@ void Gui::Render( ) noexcept {
         ImGui::SetNextWindowPos( calculateChildWindowPosition( 1, 1 ) );
         ImGui::BeginChild( "Coloured Models", childSize( 1, 1, 1.f ), true );
         {
-            ImGui::Checkbox( "Enemy", &g_config->b[ _( "chams_enemy" ) ] );
-            ImGui::ColorEdit4( "##Enemy", g_config->c[ _( "chams_enemy_col" ) ] );
-            ImGui::Checkbox( "Enemy behind walls", &g_config->b[ _( "chams_enemy_xqz" ) ] );
-            ImGui::ColorEdit4( "##Enemy behind walls", g_config->c[ _( "chams_enemy_xqz_col" ) ] );
+
         }
         ImGui::EndChild( );
     }
@@ -299,7 +283,9 @@ void Gui::Render( ) noexcept {
         ImGui::SetNextWindowPos( calculateChildWindowPosition( 0, 1 ) );
         ImGui::BeginChild( "Miscellaneous", childSize( 0, 1 ), true );
         {
-            ImGui::Checkbox( "Bunnyhop", &g_config->b[ _( "move_bhop" ) ] );
+            ImGui::Checkbox( "sex1", &g_Vars.misc.sex1 );
+            ImGui::Checkbox( "sex2", &g_Vars.misc.sex2 );
+            ImGui::Checkbox( "sex3", &g_Vars.misc.sex3 );
         }
         ImGui::EndChild( );
 
@@ -311,44 +297,112 @@ void Gui::Render( ) noexcept {
         ImGui::EndChild( );
     }
 
-    if ( m_selected_tab == 5 ) {
+    if ( selected_tab == 5 ) {
+        static std::vector<std::string> CFG_LIST;
+        static bool INITIALISE_CONFIGS = true;
+        static std::string config_name;
+
+        if ( INITIALISE_CONFIGS ) {
+            CFG_LIST = ConfigManager::GetConfigs( );
+            INITIALISE_CONFIGS = false;
+
+            if ( g_Vars.globals.m_iSelectedConfig >= 0 &&
+                g_Vars.globals.m_iSelectedConfig < CFG_LIST.size( ) )
+            {
+                config_name = CFG_LIST[ g_Vars.globals.m_iSelectedConfig ];
+            }
+            else if ( !CFG_LIST.empty( ) ) {
+                g_Vars.globals.m_iSelectedConfig = 0;
+                config_name = CFG_LIST[ 0 ];
+            }
+            else {
+                g_Vars.globals.m_iSelectedConfig = -1;
+                config_name.clear( );
+            }
+        }
+
         ImGui::SetNextWindowPos( calculateChildWindowPosition( 0, 1 ) );
         ImGui::BeginChild( "Configurations", childSize( 0, 1 ), true );
         {
-            static char cfgname[ 26 ];
-
-            ImGui::ListBoxHeader( "##cfglist", ImVec2( 225, 400 ) );
-            for ( auto cfg : g_config->configs )
-                if ( ImGui::Selectable( cfg.c_str( ), cfg == g_config->selected_cfg ) ) {
-                    g_config->selected_cfg = cfg;
-                    strcpy( g_config->input, cfg.c_str( ) );
-                    log_print( "g_config->selected_cfg = {}", cfg );
+            ImVec2 available_space = ImGui::GetContentRegionAvail( );
+            available_space.y -= ImGui::GetFrameHeightWithSpacing( ) + 5.0f;
+            ImGui::BeginListBox( "##cfglist", available_space );
+            for ( int i = 0; i < CFG_LIST.size( ); i++ ) {
+                if ( ImGui::Selectable( CFG_LIST[ i ].c_str( ),
+                    g_Vars.globals.m_iSelectedConfig == i ) ) {
+                    g_Vars.globals.m_iSelectedConfig = i;
+                    config_name = CFG_LIST[ i ]; // keep in sync
                 }
+            }
+            ImGui::EndListBox( );
 
-            ImGui::ListBoxFooter( );
+            // text input always shows the currently selected config name
+            ImGui::InputText( "##cfg",
+                config_name.data( ),
+                config_name.capacity( ) + 1,
+                ImGuiInputTextFlags_CallbackResize,
+                InputTextCallback,
+                &config_name );
 
-            //ImGui::InputText( "##cfg", strcpy( new char[ g_config->input.length( ) + 1 ], g_config->input.c_str( ) ), 128 );
 
-            if ( ImGui::InputText( "##cfg", g_config->input, 128 ) )
-                g_config->selected_cfg = std::string( g_config->input );
         }
         ImGui::EndChild( );
 
         ImGui::SetNextWindowPos( calculateChildWindowPosition( 1, 1 ) );
         ImGui::BeginChild( "Options", childSize( 1, 1 ), true );
         {
+            auto it = std::find( CFG_LIST.begin( ), CFG_LIST.end( ), config_name );
+            bool config_exists = ( it != CFG_LIST.end( ) );
 
-            if ( ImGui::Button( "Load" ) ) {
-                g_config->load( );
+            // --- Load ---
+            if ( config_exists && ImGui::Button( "Load" ) ) {
+                ConfigManager::ResetConfig( );
+                ConfigManager::LoadConfig( config_name );
             }
 
-            if ( ImGui::Button( "Save" ) ) {
-                g_config->save( );
+            // --- Save ---
+            if ( config_exists && ImGui::Button( "Save" ) ) {
+                ConfigManager::SaveConfig( config_name );
             }
 
+            // --- Delete ---
+            if ( config_exists && !( config_name == XorStr( "default" ) ) ) {
+                if ( ImGui::Button( "Delete config" ) ) {
+                    ConfigManager::RemoveConfig( config_name );
+                    CFG_LIST = ConfigManager::GetConfigs( );
+
+                    if ( !CFG_LIST.empty( ) ) {
+                        g_Vars.globals.m_iSelectedConfig = 0;
+                        config_name = CFG_LIST[ 0 ];
+                    }
+                    else {
+                        g_Vars.globals.m_iSelectedConfig = -1;
+                        config_name.clear( );
+                    }
+                }
+            }
+
+            // --- Create ---
+            if ( !config_name.empty( ) && !config_exists ) {
+                if ( ImGui::Button( "Create config" ) ) {
+                    ConfigManager::CreateConfig( config_name );
+                    CFG_LIST = ConfigManager::GetConfigs( );
+
+                    // re-select the new config
+                    auto it = std::find( CFG_LIST.begin( ), CFG_LIST.end( ), config_name );
+                    if ( it != CFG_LIST.end( ) ) {
+                        g_Vars.globals.m_iSelectedConfig = std::distance( CFG_LIST.begin( ), it );
+                    }
+                }
+            }
+
+            if ( ImGui::Button( "Open config folder" ) ) {
+                ConfigManager::OpenConfigFolder( );
+            }
         }
         ImGui::EndChild( );
     }
+
 
     ImGui::SameLine( );
 
