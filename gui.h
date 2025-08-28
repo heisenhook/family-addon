@@ -12,6 +12,7 @@ public:
 	bool open = true;
 	bool setup = false;
 	int selected_tab;
+	int selected_accuracy_tab = 0;
 
 	HWND window = nullptr;
 	WNDCLASSEX windowClass = { };

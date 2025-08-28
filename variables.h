@@ -574,162 +574,8 @@ public:
 
 #pragma region RAGE_GENERAL group
 	group_begin( RAGE_GENERAL );
-	config_option( bool, enabled, false );
-	config_keybind( key );
 
-	config_option( bool, dormant_aimbot, false );
-	config_keybind( dormant_aimbot_key );
-
-	config_option( bool, team_check, false );
-
-	config_option( bool, knife_bot, false );
-	config_option( int, knife_bot_type, 0 );
-	config_option( bool, silent_aim, false );
-	config_option( bool, auto_fire, false );
-	config_option( bool, exploit, false );
-	config_option( bool, double_tap_teleport, false );
-	config_option( float, double_tap_teleport_distance, 10.f );
-	config_option( bool, double_tap_recharge_knife, false );
-
-	config_option( bool, double_tap_recharge_threat, false );
-	config_option( bool, double_tap_recharge_shot_delay, false );
-	config_option( bool, double_tap_recharge_custom_delay, false );
-	config_option( int, double_tap_recharge_delay, 1 );
-
-	config_option( bool, double_tap_adaptive, false );
-	config_option( bool, double_tap_duck, false );
-	config_option( bool, double_tap_peek, false );
-	config_option( int, exploit_reserve, 1 );
-	config_option( int, lag_peek_factor, 10 );
-	config_option( int, double_tap_type, 0 );
-	config_option( bool, force_body_aim, false );
-	config_keybind( force_body_aim_key );
-
-	config_option( bool, resolver, false );
-	config_option( bool, resolver_trial, false );
-	config_option( bool, deduct_bruteforce, false );
-	config_option( bool, resolver_override, false );
-	config_keybind( resolver_override_key );
-
-	config_option( bool, wait_for_lby_flick, false );
-	config_keybind( wait_for_lby_flick_key );
-
-	config_option( bool, fake_lag, false );
-
-	// conditions
-	config_option( bool, fake_lag_standing, false );
-	config_option( bool, fake_lag_moving, false );
-	config_option( bool, fake_lag_air, false );
-	config_option( bool, fake_lag_unduck, false );
-	config_option( bool, fake_lag_peeking, false )
-		config_option( bool, fake_lag_firing, false );
-
-	config_option( int, fake_lag_amount, 7 );
-	config_option( int, fake_lag_type, 0 );
-
-	config_option( bool, anti_aim_active, false );
-	config_option( bool, anti_aim_dormant_check, false );
-	config_option( bool, anti_aim_at_players, false );
-
-	config_option( int, anti_aim_pitch, 0 );
-	config_option( int, anti_aim_yaw, 0 );
-	config_option( bool, anti_aim_yaw_add_jitter, false );
-	config_option( int, anti_aim_yaw_jitter, 0 );
-	config_option( int, anti_aim_yaw_running, 0 );
-	config_option( int, anti_aim_yaw_running_jitter, 0 );
-	config_option( int, anti_aim_yaw_spin_speed, 1 );
-	config_option( int, anti_aim_yaw_spin_direction, 180 );
-	config_option( int, anti_aim_base_yaw_additive, 90 );
-	config_option( float, anti_aim_experimental_range, 140.f );
-	//config_option( int, anti_aim_yaw_jumping, 0 );
-	//config_option( int, anti_aim_yaw_jumping_jitter, 0 );
-
-	config_option( int, anti_aim_fake_yaw, 0 );
-	config_option( int, anti_aim_fake_yaw_relative, 0 );
-	config_option( int, anti_aim_fake_yaw_jitter, 0 );
-
-	config_option( bool, anti_aim_twist, false );
-	config_option( bool, anti_aim_edge, false );
-	config_keybind( anti_aim_edge_key );
-	config_option( bool, anti_aim_freestand, false );
-	config_keybind( anti_aim_freestand_key );
-
-	config_option( bool, anti_aim_random_on_hit, false );
-	config_option( bool, linear_lel, false );
-
-	config_option( int, anti_aim_fake_flick, 0 );
-	config_keybind( anti_aim_fake_flick_key );
-
-	config_option( bool, anti_aim_fake_body, false );
-	config_option( int, anti_aim_fake_body_side, 0 );
-	config_option( bool, anti_aim_fake_body_crooked, false );
-	config_option( bool, anti_aim_fake_body_twist, false );
-	config_option( bool, anti_aim_fake_body_hide, false );
-	config_option( bool, anti_aim_fake_body_balance, true );
-	config_option( int, anti_aim_fake_body_amount, 115 );
-	config_option( int, aaa, 14 );
-	config_option( float, aaaa, 22 );
-
-	config_option( bool, anti_aim_desync_land_first, false );
-	config_option( bool, anti_aim_desync_land_force, false );
-	config_keybind( anti_aim_desync_land_key );
-	config_option( int, anti_aim_desync_land_delta, 135 );
-
-	config_option( bool, anti_aim_distortion_stand, false );
-	config_option( bool, anti_aim_distortion_air, false );
-	config_option( bool, anti_aim_distortion_move, false );
-	config_option( bool, anti_aim_distortion_crouch, false );
-	config_option( int, anti_aim_distortion_side, 0 );
-	config_option( bool, anti_aim_distortion_disable_on_manual, false )
-		config_option( bool, anti_aim_distortion_hide_flick, false );
-	config_option( bool, anti_aim_distortion_hide_moving, false );
-	config_keybind( anti_aim_distortion_key );
-
-	config_option( bool, anti_aim_manual, false );
-
-	config_option( bool, anti_aim_manual_arrows, false );
-	config_option( bool, anti_aim_manual_arrows_draw_inactive, false );
-	config_option( int, anti_aim_manual_arrows_size, 22 );
-	config_option( int, anti_aim_manual_arrows_spacing, 60 );
-	config_option( Color_f, anti_aim_manual_arrows_color, Color_f( 1.f, 1.f, 1.f, 1.f ) );
-
-	config_option( bool, anti_aim_manual_ignore_distortion, false );
-	config_option( bool, anti_aim_indi, false );
-	config_option( bool, anti_aim_fps, false );
-	config_option( Color_f, anti_aim_indi_color, Color_f( 1.f, 1.f, 1.f, 1.f ) );
-
-
-	config_keybind( anti_aim_lock_angle_key );
-	config_keybind( anti_aim_manual_left_key );
-	config_keybind( anti_aim_manual_right_key );
-	config_keybind( anti_aim_manual_back_key );
-	config_keybind( anti_aim_manual_forward_key );
-
-	config_option( bool, disable_anti_aim_manual_air, false );
-	config_option( bool, reset_anti_aim_manual_air, true );
-
-	config_keybind( min_damage_override_key );
-	config_keybind( force_safepoint_key );
-
-	config_option( bool, fam_resolver_fucker, false );
-	config_keybind( fam_resolver_fucker_bind );
-
-	config_keybind( double_tap_bind );
-	config_option( bool, double_tap_lc_break, false );
-	config_option( float, double_tap_hitchance, 0.f );
-	config_keybind( hide_shots_bind );
-
-	config_keybind( force_recharge );
-
-	config_option( bool, resolver_low_delta_shots_enable, false );
-	config_option( int, resolver_low_delta_shots, 0 );
-
-	config_option( int, target_limit, 4 );
-
-	config_option( bool, low_performance_bt, false );
-
-	config_option( bool, visualize_aimpoints, false );
-	config_option( Color_f, visualize_aimpoints_clr, Color_f( 1.f, 1.f, 1.f, 1.f ) );
+	config_option( int, accuracy, 0 ); // Fake angles, Lag compensation, Override aimbot, Override accuracy
 
 	// debug stuff here.
 #if defined(DEV) || defined(BETA_MODE) || defined(DEBUG_MODE)
@@ -755,23 +601,91 @@ public:
 	config_option( bool, automatic_fire, false );
 
 
-	config_option( bool, hitbox_head, false );
-	config_option( bool, hitbox_chest, false );
-	config_option( bool, hitbox_body, false );
-	config_option( bool, hitbox_arms, false );
-	config_option( bool, hitbox_thighs, false );
-	config_option( bool, hitbox_calfs, false );
-	config_option( bool, hitbox_feet, false );
+	config_option( bool, hitbox_head, true );
+	config_option( bool, hitbox_chest, true );
+	config_option( bool, hitbox_body, true );
+	config_option( bool, hitbox_arms, true );
+	config_option( bool, hitbox_thighs, true );
+	config_option( bool, hitbox_calfs, true );
+	config_option( bool, hitbox_feet, true );
 
-	config_option( bool, multipoint_head, false );
-	config_option( bool, multipoint_chest, false );
-	config_option( bool, multipoint_body, false );
-	config_option( bool, multipoint_arms, false );
-	config_option( bool, multipoint_thighs, false );
-	config_option( bool, multipoint_calfs, false );
-	config_option( bool, multipoint_feet, false );
+	config_option( bool, multipoint_head, true );
+	config_option( bool, multipoint_chest, true );
+	config_option( bool, multipoint_body, true );
+	config_option( bool, multipoint_arms, true );
+	config_option( bool, multipoint_thighs, true );
+	config_option( bool, multipoint_calfs, true );
+	config_option( bool, multipoint_feet, true );
 
-	config_option( int, multipoint_intensity, 0 );
+	config_option( int, multipoint_intensity, 0 ); // Normal, High, Very high
+	config_option( int, pointscale, 90 );
+	config_option( int, maximum_aim_height, 90 );
+
+	config_option( bool, seperate_pointscale, false );
+	config_option( int, pointscale_head, 90 );
+	config_option( int, pointscale_limbs, 90 );
+
+	config_option( bool, bodyflags_non_strict_force_baim, false );
+	config_option( bool, bodyflags_headshot_only_server, false );
+	
+	config_option( bool, bindflags_use_two_damage_overrides, false );
+	config_option( bool, bindflags_reset_keybinds_each_round, false );
+	config_option( bool, bindflags_keep_keybinds_on_death, false );
+	config_option( bool, bindflags_hold_baim_key, false );
+
+	config_option( int, scan_intensity, 2 ); // Low, Medium, High
+
+	config_option( int, minimum_damage, 25 );
+	config_option( int, minimum_damage_override_primary, 10 );
+	config_option( int, minimum_damage_override_secondary, 100 );
+
+	config_option( int, minimum_hitchance, 75 );
+	config_option( int, minimum_hitchance_override_primary, 0 );
+	config_option( int, minimum_hitchance_override_secondary, 0 );
+	config_option( bool, minimum_damage_override_hitchance, false ) // Override hitchance whilst overriding minimum damage
+
+	config_option( int, prefer_hitchance, 0 );
+	config_option( int, prefer_baim, 10 );
+	config_option( int, minimal_assessed_damage, 10 );
+
+	config_option( bool, autostop_early, false );
+	config_option( bool, autostop_stop, true );
+	config_option( bool, autostop_jumpscout, true );
+	config_option( bool, autostop_autoscope, true );
+	config_option( bool, autostop_delay_fakelag, true );
+	config_option( bool, autostop_delay_spread, true );
+	config_option( bool, autostop_delay_taser, true );
+
+	// Fake angles
+	config_option( int, standing_baim, 0 ); // Off, Low, Medium, High, Very high
+	config_option( int, strict_standing_baim, 0 ); // Off, Low, Medium, High, Very high
+	config_option( int, air_baim, 2 ); // Off, Low, Medium, High, Very high
+	config_option( int, limit_air_pointscale, 30 );
+	config_option( int, strict_air_baim, 2 ); // Off, Low, Medium, High, Very high
+
+	// Lag compensation
+	config_option( int, avoid_body_edges, 2 ); // Off, Low, Medium, High, Very high
+	config_option( int, prefer_fakebody_overlap, 10 );
+	config_option( int, head_accuracy_mode, 2 ); // Below normal, Normal, Strict
+	config_option( int, prefer_fakehead_overlap, 50 );
+
+	// Accuracy
+	config_option( bool, reduce_hitchance, false ); // Reduce hitchance to avoid delay
+	config_option( int, reduce_hitchance_value, 50 ) 
+	config_option( int, reduce_hitchance_delay, 175 ); // Period to wait until reducing ( 0ms-250ms)
+	config_option( bool, reduce_hitchance_damage_override ); // Allow hitchance reduction while overriding damage
+
+	config_option( bool, autostopflags_fallback, false );
+	config_option( bool, autostopflags_avoid_locking_movement, true );
+	config_option( bool, autostopflags_early_lag_delayed, false );
+	config_option( bool, autostopflags_early_normal_peek, true );
+	config_option( bool, autostopflags_early_aggresive_peek, true );
+
+	config_option( int, passive_delay_on_peek, 1 ); // Off, When safe, Always
+	config_option( int, force_delay_on_peek, 0 ); // Off, When safe, Always
+
+
+
 
 
 
@@ -1259,6 +1173,8 @@ public:
 
 #pragma region MISC group
 	group_begin( MISC );
+
+	config_option( bool, disable_adaptive_weapons, true );
 
 	config_option( bool, sex1, false );
 	config_option( bool, sex2, true );
