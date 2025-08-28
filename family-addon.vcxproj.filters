@@ -13,6 +13,30 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\include">
+      <UniqueIdentifier>{2201767f-cda5-4e7a-baa6-10c6007271fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\include\minhook">
+      <UniqueIdentifier>{a61214da-5c63-41c3-b2c0-0fae82eacdfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\include\minhook\hde">
+      <UniqueIdentifier>{8080c4eb-9c85-4457-a7c3-7ef86178268e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\include\imgui">
+      <UniqueIdentifier>{641c39c1-aa2b-4ec0-9c8c-237ff5a7841b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\include">
+      <UniqueIdentifier>{f5818e6d-d35a-4333-b523-e0b8cc922d5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\include\imgui">
+      <UniqueIdentifier>{a19a8d91-e917-460f-9afd-d9459b4ab71e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\include\minhook">
+      <UniqueIdentifier>{0a29adad-42d5-4b0a-928e-e75d3e6cf27f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\include\minhook\hde">
+      <UniqueIdentifier>{9c27c2e6-b9df-4e6d-adef-15b899979a5b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes.h">
@@ -24,77 +48,77 @@
     <ClInclude Include="gui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dependencies\include\imgui\imconfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dependencies\include\imgui\imgui.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dependencies\include\imgui\imgui_impl_dx9.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dependencies\include\imgui\imgui_impl_win32.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dependencies\include\imgui\imgui_internal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dependencies\include\imgui\imstb_rectpack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dependencies\include\imgui\imstb_textedit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dependencies\include\imgui\imstb_truetype.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dependencies\include\minhook\hde\hde32.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dependencies\include\minhook\hde\hde64.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dependencies\include\minhook\hde\pstdint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dependencies\include\minhook\hde\table32.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dependencies\include\minhook\hde\table64.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dependencies\include\minhook\buffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dependencies\include\minhook\MinHook.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dependencies\include\minhook\trampoline.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="variables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dependencies\include\json.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dependencies\include\xorstr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dependencies\include\FnvHash.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dependencies\include\base64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="color.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\imgui\imstb_truetype.h">
+      <Filter>Header Files\include\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\imgui\imgui_impl_win32.h">
+      <Filter>Header Files\include\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\imgui\imgui_internal.h">
+      <Filter>Header Files\include\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\imgui\imstb_rectpack.h">
+      <Filter>Header Files\include\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\imgui\imstb_textedit.h">
+      <Filter>Header Files\include\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\imgui\imgui_impl_dx9.h">
+      <Filter>Header Files\include\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\imgui\imgui.h">
+      <Filter>Header Files\include\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\imgui\imconfig.h">
+      <Filter>Header Files\include\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\minhook\hde\hde32.h">
+      <Filter>Header Files\include\minhook\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\minhook\hde\hde64.h">
+      <Filter>Header Files\include\minhook\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\minhook\hde\table64.h">
+      <Filter>Header Files\include\minhook\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\minhook\hde\table32.h">
+      <Filter>Header Files\include\minhook\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\minhook\hde\pstdint.h">
+      <Filter>Header Files\include\minhook\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\minhook\MinHook.h">
+      <Filter>Header Files\include\minhook</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\minhook\trampoline.h">
+      <Filter>Header Files\include\minhook</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\minhook\buffer.h">
+      <Filter>Header Files\include\minhook\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\base64.h">
+      <Filter>Header Files\include\minhook\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\FnvHash.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\json.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\include\xorstr.h">
+      <Filter>Header Files\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -107,42 +131,6 @@
     <ClCompile Include="gui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dependencies\include\imgui\imgui.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dependencies\include\imgui\imgui_demo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dependencies\include\imgui\imgui_draw.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dependencies\include\imgui\imgui_impl_dx9.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dependencies\include\imgui\imgui_impl_win32.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dependencies\include\imgui\imgui_tables.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dependencies\include\imgui\imgui_widgets.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dependencies\include\minhook\hde\hde32.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dependencies\include\minhook\hde\hde64.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dependencies\include\minhook\buffer.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dependencies\include\minhook\hook.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dependencies\include\minhook\trampoline.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="memory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -151,6 +139,42 @@
     </ClCompile>
     <ClCompile Include="variables.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\include\imgui\imgui_widgets.cpp">
+      <Filter>Source Files\include\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\include\imgui\imgui_demo.cpp">
+      <Filter>Source Files\include\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\include\imgui\imgui_draw.cpp">
+      <Filter>Source Files\include\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\include\imgui\imgui_impl_dx9.cpp">
+      <Filter>Source Files\include\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\include\imgui\imgui_impl_win32.cpp">
+      <Filter>Source Files\include\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\include\imgui\imgui_tables.cpp">
+      <Filter>Source Files\include\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\include\imgui\imgui.cpp">
+      <Filter>Source Files\include\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\include\minhook\trampoline.c">
+      <Filter>Source Files\include\minhook</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\include\minhook\hook.c">
+      <Filter>Source Files\include\minhook</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\include\minhook\hde\hde32.c">
+      <Filter>Source Files\include\minhook\hde</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\include\minhook\hde\hde64.c">
+      <Filter>Source Files\include\minhook\hde</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\include\minhook\buffer.c">
+      <Filter>Source Files\include\minhook\hde</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
