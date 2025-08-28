@@ -4,9 +4,9 @@
 #include <map>
 #include <d3d9.h>
 #include <array>
-#include "dependencies/include/json.h"
-#include "dependencies/include/xorstr.h"
-#include "dependencies/include/FnvHash.h"
+#include "json.h"
+#include "xorstr.h"
+#include "FnvHash.h"
 
 class CUserCmd;
 

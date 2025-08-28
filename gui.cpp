@@ -2,10 +2,10 @@
 #include "gui.h"
 #include "config.h"
 
-#include "dependencies/include/imgui/imgui.h"
-#include "dependencies/include/imgui/imgui_impl_win32.h"
-#include "dependencies/include/imgui/imgui_impl_dx9.h"
-#include "dependencies/include/imgui/imgui_internal.h"
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_dx9.h"
+#include "imgui_internal.h"
 
 #include <stdexcept>
 

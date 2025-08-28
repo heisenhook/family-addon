@@ -1,12 +1,12 @@
 #include "includes.h"
 
-#include "dependencies/include/minhook/MinHook.h"
+#include "MinHook.h"
 #include <intrin.h>
 #include <stdexcept>
 
-#include "dependencies/include/imgui/imgui.h"
-#include "dependencies/include/imgui/imgui_impl_win32.h"
-#include "dependencies/include/imgui/imgui_impl_dx9.h"
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_dx9.h"
 
 Hooks g_hooks{ };
 

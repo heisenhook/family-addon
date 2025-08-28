@@ -1,7 +1,7 @@
 ﻿#include "config.h"
-#include "dependencies/include/xorstr.h"
-#include "dependencies/include/json.h"
-#include "dependencies/include/base64.h"
+#include "xorstr.h"
+#include "json.h"
+#include "base64.h"
 #include "variables.h"
 #include <fstream>
 #include <iomanip>
