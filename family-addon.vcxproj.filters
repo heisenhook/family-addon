@@ -120,6 +120,9 @@
     <ClInclude Include="trampoline.h">
       <Filter>Header Files\include\minhook</Filter>
     </ClInclude>
+    <ClInclude Include="address.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -175,6 +178,9 @@
     </ClCompile>
     <ClCompile Include="imgui_tables.cpp">
       <Filter>Source Files\include\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="address.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

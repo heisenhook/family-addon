@@ -520,6 +520,7 @@ void Gui::Render( ) noexcept {
             ImGui::Checkbox( "sex1", &g_Vars.misc.sex1 );
             ImGui::Checkbox( "sex2", &g_Vars.misc.sex2 );
             ImGui::Checkbox( "sex3", &g_Vars.misc.sex3 );
+
         }
         ImGui::EndChild( );
 

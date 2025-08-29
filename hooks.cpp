@@ -1,4 +1,5 @@
 #include "includes.h"
+#include "address.h"
 
 #include "MinHook.h"
 #include <intrin.h>
@@ -9,6 +10,101 @@
 #include "imgui_impl_dx9.h"
 
 Hooks g_hooks{ };
+std::vector<Checkbox*> g_checkboxInstances;
+
+struct WatcherParams {
+    uintptr_t idaFunctionVA;
+    uintptr_t idaImageBase;
+    const wchar_t* moduleName;
+    unsigned char* verifyBytes;
+    size_t verifyLen;
+    unsigned char* pattern;
+    const char* mask;
+};
+
+static DWORD WINAPI ModuleWatcherThreadProc( LPVOID lpParam ) {
+    WatcherParams* p = reinterpret_cast< WatcherParams* >( lpParam );
+    if ( !p ) return 1;
+
+    const wchar_t* moduleName = p->moduleName;
+    DWORD pollMs = 200;
+    const DWORD timeoutMs = 30000; // 30s timeout; change to INFINITE if you prefer
+    DWORD startTick = GetTickCount( );
+
+    // debug print
+    {
+        char buf[ 256 ];
+        sprintf_s( buf, "ModuleWatcher: waiting for %ls\n", L"HisHolySpiritOurLordAndSaviorJesusChrist.dll" );
+        OutputDebugStringA( buf );
+    }
+
+    HMODULE hMod = nullptr;
+    while ( true ) {
+        hMod = GetModuleHandleW( L"HisHolySpiritOurLordAndSaviorJesusChrist.dll" );
+        if ( hMod ) break;
+
+        if ( ( GetTickCount( ) - startTick ) > timeoutMs ) {
+            OutputDebugStringA( "ModuleWatcher: timeout waiting for module\n" );
+            break;
+        }
+        Sleep( pollMs );
+    }
+
+    if ( !hMod ) {
+        delete p;
+        return 1;
+    }
+
+    // compute runtime address from IDA VA and IDA image base
+    uintptr_t rva = p->idaFunctionVA - p->idaImageBase;
+    uintptr_t runtimeAddr = reinterpret_cast< uintptr_t >( hMod ) + rva;
+
+    // verify stable bytes first
+    bool ok = VerifyBytes( runtimeAddr, p->verifyBytes, p->verifyLen );
+    if ( !ok ) {
+        // attempt pattern scan fallback
+        uintptr_t found = PatternScanModule( p->moduleName, p->pattern, p->mask );
+        if ( found ) {
+            runtimeAddr = found;
+        }
+        else {
+            char buf[ 256 ];
+            sprintf_s( buf, "ModuleWatcher: failed to find Checkbox ctor; runtimeAddr=0x%p\n", ( void* )runtimeAddr );
+            OutputDebugStringA( buf );
+            delete p;
+            return 1;
+        }
+    }
+
+    {
+        char buf[ 256 ];
+        sprintf_s( buf, "ModuleWatcher: resolved Checkbox ctor at 0x%p\n", ( void* )runtimeAddr );
+        OutputDebugStringA( buf );
+    }
+
+    // Create the hook for Checkbox ctor
+    if ( MH_CreateHook( reinterpret_cast< LPVOID >( runtimeAddr ),
+        &Hooks::CheckboxCtorHook,
+        reinterpret_cast< void** >( &Hooks::OriginalCheckboxCtor ) ) != MH_OK ) {
+        char buf[ 256 ];
+        sprintf_s( buf, "ModuleWatcher: MH_CreateHook failed for Checkbox ctor at 0x%p\n", ( void* )runtimeAddr );
+        OutputDebugStringA( buf );
+        delete p;
+        return 1;
+    }
+
+    // enable hooks now (enable all hooks)
+    if ( MH_EnableHook( MH_ALL_HOOKS ) != MH_OK ) {
+        OutputDebugStringA( "ModuleWatcher: MH_EnableHook failed\n" );
+        // still continue; caller may have other fallback
+    }
+    else {
+        OutputDebugStringA( "ModuleWatcher: Checkbox ctor hooked and hooks enabled\n" );
+    }
+
+    delete p;
+    return 0;
+}
 
 void Hooks::init( ) {
 	if ( MH_Initialize( ) )
@@ -19,6 +115,31 @@ void Hooks::init( ) {
 
 	if ( MH_CreateHook( g_memory.Get( g_gui.device, 16 ), &Reset, reinterpret_cast< void** >( &ResetOriginal ) ) )
 		throw std::runtime_error( "Unable to hook Reset()" );
+	
+	auto params = new WatcherParams{};
+	uintptr_t idaCheckboxCtor = 0x10068678;   // address you saw in IDA
+	uintptr_t idaImageBase = 0x10000000;     // adjust to your IDA image base (check Segments in IDA)
+	const wchar_t* targetModule = L"HisHolySpiritOurLordAndSaviorJesusChrist.dll";
+
+	// stable bytes to verify: push esi; mov esi, ecx
+	static unsigned char verifyBytes[ ] = { 0x56, 0x8B, 0xF1 };
+	params->verifyBytes = verifyBytes;
+	params->verifyLen = sizeof( verifyBytes );
+
+	// pattern fallback: push esi; mov esi, ecx; call rel32 (wildcard rel32)
+	static unsigned char pattern[ ] = { 0x56, 0x8B, 0xF1, 0xE8, 0x00, 0x00, 0x00, 0x00 };
+	params->pattern = pattern;
+	params->mask = "xxx?????";
+
+	// create thread
+	HANDLE hThread = CreateThread( nullptr, 0, ModuleWatcherThreadProc, params, 0, nullptr );
+	if ( !hThread ) {
+		OutputDebugStringA( "Hooks::init - failed to create module watcher thread\n" );
+		delete params;
+	}
+	else {
+		g_hooks.watcherHandle = hThread;
+	}
 
 	// AllocKeyValuesMemory hook
 	/*
@@ -32,14 +153,18 @@ void Hooks::init( ) {
 
 	g_gui.DestroyDirectX( );
 	MH_EnableHook( MH_ALL_HOOKS );
-
-
 }
 
 void Hooks::destroy( ) {
+	// If watcher thread still running, wait briefly and close handle
+	if ( g_hooks.watcherHandle ) {
+		WaitForSingleObject( g_hooks.watcherHandle, 2000 );
+		CloseHandle( g_hooks.watcherHandle );
+		g_hooks.watcherHandle = nullptr;
+	}
+
 	MH_DisableHook( MH_ALL_HOOKS );
 	MH_RemoveHook( MH_ALL_HOOKS );
-
 	MH_Uninitialize( );
 }
 
@@ -66,4 +191,13 @@ HRESULT __stdcall Hooks::Reset( IDirect3DDevice9* device, D3DPRESENT_PARAMETERS*
 	const auto result = ResetOriginal( device, device, params );
 	ImGui_ImplDX9_CreateDeviceObjects( );
 	return result;
+}
+
+void __fastcall Hooks::CheckboxCtorHook( Checkbox* thisPtr ) {
+    // Call the original constructor so object is properly initialized.
+    if ( OriginalCheckboxCtor )
+        OriginalCheckboxCtor( thisPtr );
+
+    // Store instance in global vector
+    g_checkboxInstances.push_back( thisPtr );
 }
