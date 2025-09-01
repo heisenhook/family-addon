@@ -123,6 +123,9 @@
     <ClInclude Include="address.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="typedef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

@@ -3,8 +3,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <d3d9.h>
-
-class Checkbox; // forward declaration
+#include "typedef.h"
 
 class Hooks {
 public:
@@ -22,6 +21,10 @@ public:
     using CheckboxCtorFn = void( __thiscall* )( Checkbox* );
     inline static CheckboxCtorFn OriginalCheckboxCtor = nullptr;
     static void __fastcall CheckboxCtorHook( Checkbox* thisPtr );
+
+    using Checkbox__ThinkFn = void(__thiscall*)(Checkbox*);
+    inline static Checkbox__ThinkFn oCheckbox__Think = nullptr;
+    static void __fastcall Checkbox__Think(Checkbox* ecx);
 
     HANDLE watcherHandle = nullptr;
 };

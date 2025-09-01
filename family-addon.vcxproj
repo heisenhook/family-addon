@@ -174,6 +174,7 @@
     <ClInclude Include="table32.h" />
     <ClInclude Include="table64.h" />
     <ClInclude Include="trampoline.h" />
+    <ClInclude Include="typedef.h" />
     <ClInclude Include="variables.h" />
     <ClInclude Include="xorstr.h" />
   </ItemGroup>

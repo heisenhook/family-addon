@@ -115,6 +115,9 @@ void Hooks::init( ) {
 
 	if ( MH_CreateHook( g_memory.Get( g_gui.device, 16 ), &Reset, reinterpret_cast< void** >( &ResetOriginal ) ) )
 		throw std::runtime_error( "Unable to hook Reset()" );
+
+    if (MH_CreateHook(g_memory.PatternScan("HisHolySpiritOurLordAndSaviorJesusChrist.dll", "55 8B EC 83 EC 08 56 8B  F1 80 BE 8D 00 00 00 00"), &Checkbox__Think, reinterpret_cast<void**>(&oCheckbox__Think)))
+        throw std::runtime_error("Unable to hook Checkbox::Think()");
 	
 	auto params = new WatcherParams{};
 	uintptr_t idaCheckboxCtor = 0x10068678;   // address you saw in IDA
@@ -200,4 +203,25 @@ void __fastcall Hooks::CheckboxCtorHook( Checkbox* thisPtr ) {
 
     // Store instance in global vector
     g_checkboxInstances.push_back( thisPtr );
+}
+
+void __fastcall Hooks::Checkbox__Think(Checkbox* ecx) {
+    for (Checkbox* checkbox : g_checkboxInstances) {
+        // if our list of checkboxes already contains
+        // this checkbox, call it's think function and return
+        if (checkbox == ecx) {
+            if (checkbox->m_parent) {
+                if (checkbox->m_parent->m_active_tab) {
+                    Tab* tab = checkbox->m_parent->m_active_tab;
+                    auto lol = tab->m_title;
+                }
+            }
+            return oCheckbox__Think(ecx);
+        }
+    }
+
+    // if this checkbox wasn't found in our list, add it
+    // to the list and return the original function
+    g_checkboxInstances.push_back(ecx);
+    return oCheckbox__Think(ecx);
 }
