@@ -11,6 +11,7 @@ public:
     void init( );
     void destroy( );
 
+    // hooks
     using EndSceneFn = long( __thiscall* )( void*, IDirect3DDevice9* ) noexcept;
     inline static EndSceneFn EndSceneOriginal = nullptr;
     static long __stdcall EndScene( IDirect3DDevice9* device ) noexcept;
@@ -26,6 +27,8 @@ public:
     using Checkbox__ThinkFn = void(__thiscall*)(Checkbox*);
     inline static Checkbox__ThinkFn oCheckbox__Think = nullptr;
     static void __fastcall Checkbox__Think(Checkbox* ecx);
+
+    // funcs
 
     HANDLE watcherHandle = nullptr;
 };

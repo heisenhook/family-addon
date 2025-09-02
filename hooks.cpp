@@ -119,33 +119,7 @@ void Hooks::init( ) {
 
     if (MH_CreateHook(g_memory.PatternScan("HisHolySpiritOurLordAndSaviorJesusChrist.dll", "55 8B EC 83 EC 08 56 8B  F1 80 BE 8D 00 00 00 00"), &Checkbox__Think, reinterpret_cast<void**>(&oCheckbox__Think)))
         throw std::runtime_error("Unable to hook Checkbox::Think()");
-	
-    /*
-	auto params = new WatcherParams{};
-	uintptr_t idaCheckboxCtor = 0x10068678;   // address you saw in IDA
-	uintptr_t idaImageBase = 0x10000000;     // adjust to your IDA image base (check Segments in IDA)
-	const wchar_t* targetModule = L"HisHolySpiritOurLordAndSaviorJesusChrist.dll";
 
-	// stable bytes to verify: push esi; mov esi, ecx
-	static unsigned char verifyBytes[ ] = { 0x56, 0x8B, 0xF1 };
-	params->verifyBytes = verifyBytes;
-	params->verifyLen = sizeof( verifyBytes );
-
-	// pattern fallback: push esi; mov esi, ecx; call rel32 (wildcard rel32)
-	static unsigned char pattern[ ] = { 0x56, 0x8B, 0xF1, 0xE8, 0x00, 0x00, 0x00, 0x00 };
-	params->pattern = pattern;
-	params->mask = "xxx?????";
-
-	// create thread
-	HANDLE hThread = CreateThread( nullptr, 0, ModuleWatcherThreadProc, params, 0, nullptr );
-	if ( !hThread ) {
-		OutputDebugStringA( "Hooks::init - failed to create module watcher thread\n" );
-		delete params;
-	}
-	else {
-		g_hooks.watcherHandle = hThread;
-	}
-    */
 
 	// AllocKeyValuesMemory hook
 	/*
