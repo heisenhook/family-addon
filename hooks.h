@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
-#include <algorithm>
+#include <algorithm>'
+#include <unordered_set>
 #include <stdexcept>
 #include <d3d9.h>
 #include "typedef.h"
@@ -30,4 +31,4 @@ public:
 };
 
 extern Hooks g_hooks;
-extern std::vector<Checkbox*> g_checkboxInstances;
+extern std::unordered_set<Checkbox*> g_checkboxInstances;

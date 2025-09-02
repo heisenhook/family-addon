@@ -4,13 +4,14 @@
 #include "MinHook.h"
 #include <intrin.h>
 #include <stdexcept>
+#include <unordered_set>
 
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx9.h"
 
 Hooks g_hooks{ };
-std::vector<Checkbox*> g_checkboxInstances;
+std::unordered_set<Checkbox*> g_checkboxInstances;
 
 struct WatcherParams {
     uintptr_t idaFunctionVA;
@@ -119,6 +120,7 @@ void Hooks::init( ) {
     if (MH_CreateHook(g_memory.PatternScan("HisHolySpiritOurLordAndSaviorJesusChrist.dll", "55 8B EC 83 EC 08 56 8B  F1 80 BE 8D 00 00 00 00"), &Checkbox__Think, reinterpret_cast<void**>(&oCheckbox__Think)))
         throw std::runtime_error("Unable to hook Checkbox::Think()");
 	
+    /*
 	auto params = new WatcherParams{};
 	uintptr_t idaCheckboxCtor = 0x10068678;   // address you saw in IDA
 	uintptr_t idaImageBase = 0x10000000;     // adjust to your IDA image base (check Segments in IDA)
@@ -143,6 +145,7 @@ void Hooks::init( ) {
 	else {
 		g_hooks.watcherHandle = hThread;
 	}
+    */
 
 	// AllocKeyValuesMemory hook
 	/*
@@ -198,30 +201,28 @@ HRESULT __stdcall Hooks::Reset( IDirect3DDevice9* device, D3DPRESENT_PARAMETERS*
 
 void __fastcall Hooks::CheckboxCtorHook( Checkbox* thisPtr ) {
     // Call the original constructor so object is properly initialized.
-    if ( OriginalCheckboxCtor )
-        OriginalCheckboxCtor( thisPtr );
+    //if ( OriginalCheckboxCtor )
+    //    OriginalCheckboxCtor( thisPtr );
 
     // Store instance in global vector
-    g_checkboxInstances.push_back( thisPtr );
+    //g_checkboxInstances.push_back( thisPtr );
 }
 
 void __fastcall Hooks::Checkbox__Think(Checkbox* ecx) {
-    for (Checkbox* checkbox : g_checkboxInstances) {
-        // if our list of checkboxes already contains
-        // this checkbox, call it's think function and return
-        if (checkbox == ecx) {
-            if (checkbox->m_parent) {
-                if (checkbox->m_parent->m_active_tab) {
-                    Tab* tab = checkbox->m_parent->m_active_tab;
-                    auto lol = tab->m_title;
-                }
-            }
-            return oCheckbox__Think(ecx);
+    auto [it, inserted] = g_checkboxInstances.insert( ecx );
+
+    // if it already existed, not inserted -> just call original
+    if ( !inserted ) {
+
+
+        /*
+        if ( ecx->m_parent && ecx->m_parent->m_active_tab ) {
+            Tab* tab = ecx->m_parent->m_active_tab;
+            auto lol = tab->m_title; // you can log / debug here
         }
+        */
+
     }
 
-    // if this checkbox wasn't found in our list, add it
-    // to the list and return the original function
-    g_checkboxInstances.push_back(ecx);
-    return oCheckbox__Think(ecx);
+    return oCheckbox__Think( ecx );
 }

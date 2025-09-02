@@ -1,54 +1,79 @@
 #pragma once
 
+struct GameString
+{
+    union
+    {
+        char ssoData[ 16 ];   // Inline storage (Small String Optimization)
+        char* heapPtr;      // Used when string is too large for SSO
+    };
+
+    int length;             // Number of characters in use
+    int capacity;           // Buffer size (without null terminator)
+
+    // Helper to get a readable C-string
+    const char* c_str( ) const
+    {
+        // If length fits in the inline buffer, use SSO
+        if ( length <= 15 )
+            return ssoData;
+
+        // Otherwise use the heap pointer
+        return heapPtr;
+    }
+
+    std::string to_std( ) const
+    {
+        return std::string( c_str( ), length );
+    }
+};
+
 class Tab;
 class Element;
 class Form {
 public:
-	/*0x00*/double m_opacity;
-private:
-	/*0x08*/ int one;
-	/*0x0C*/ int two;
-	/*0x10*/ int three;
-public:
-	/*0x14*/ int m_x;
-	/*0x18*/ int m_y;
-	/*0x1c*/ int m_width;
-	/*0x20*/ int m_height;
-	/*0x24*/ int m_tick;
-	/*0x28*/ std::vector<Tab*> m_tabs;
-private:
-	/*0x2C*/ char pad01[0x18];
-public:
-	/*0x50*/ int m_tab_count;
-	/*0x54*/ Tab* m_active_tab;
-	/*0x58*/ Element* m_active_element;
+    /*0x00*/ double m_opacity;       // 8 bytes
+    /*0x08*/ int one;
+    /*0x0C*/ int two;
+    /*0x10*/ int three;
+    /*0x14*/ int m_x;
+    /*0x18*/ int m_y;
+    /*0x1C*/ int m_width;
+    /*0x20*/ int m_height;
+    /*0x24*/ int m_tick;
+    /*0x28*/ std::vector<Tab*> m_tabs; // 0x0C (32-bit!)
+    /*0x34*/ char pad01[ 0x1C ];        // to reach 0x50
+    /*0x50*/ int m_tab_count;
+    /*0x54*/ Tab* m_active_tab;
+    /*0x58*/ Element* m_active_element;
 };
 
 class Tab {
 public:
-	/*0x00*/ const char m_title[0x18];
-private:
-	/*0x18*/ int one;
-public:
-	/*0x1C*/ std::vector<Element*> m_elements;
+    /*0x00*/ char m_title[ 0x18 ];  // fixed-size char array
+    /*0x18*/ int one;
+    /*0x1C*/ std::vector<Element*> m_elements; // 0x0C
 };
 
 class Element {
-private:
-	/*0x00*/ char pad01[0x24];
 public:
-	/*0x24*/ Form* m_parent;
-	/*0x28*/ const char m_label[0x18];
-	/*0x40*/ const char m_file_id[0x18];
 private:
-	/*0x58*/ char pad02[0x7C];
-}; 
+    char pad0[ 0x28 ];
+public:
+    // void* m_parent;
+    GameString m_label;
+    GameString m_file_id;
+private:
+    char pad1[ 0x7C ];
+
+public:
+    // Accessors
+    std::string label( ) const { return m_label.to_std( ); }
+    std::string file_id( ) const { return m_file_id.to_std( ); }
+}; // total: 0xD4
 
 class Checkbox : public Element {
 public:
-	bool enabled;
-private:
-	char pad01[0x3];
-public:
-	const char m_label[0x18];
-};
+    int enabled;              // 0xD4 (based on CE view)
+    char pad2[ 0x28 ];          // padding until next pointer/field
+}; // ends around 0xF0
