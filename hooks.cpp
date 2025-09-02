@@ -183,11 +183,10 @@ void __fastcall Hooks::CheckboxCtorHook( Checkbox* thisPtr ) {
 }
 
 void __fastcall Hooks::Checkbox__Think(Checkbox* ecx) {
-    auto [it, inserted] = g_checkboxInstances.insert( ecx );
 
     // if it already existed, not inserted -> just call original
-    if ( !inserted ) {
-
+    if (!(g_checkboxInstances.find(ecx) != g_checkboxInstances.end())) {
+        Log() << "Found checkbox " << ecx->label().c_str() << " at " << std::format("{:X}", (DWORD)ecx);
 
         /*
         if ( ecx->m_parent && ecx->m_parent->m_active_tab ) {
@@ -197,6 +196,8 @@ void __fastcall Hooks::Checkbox__Think(Checkbox* ecx) {
         */
 
     }
+
+    auto [it, inserted] = g_checkboxInstances.insert(ecx);
 
     return oCheckbox__Think( ecx );
 }

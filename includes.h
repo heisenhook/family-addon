@@ -13,3 +13,4 @@
 #include "config.h"
 #include "variables.h"
 #include "xorstr.h"
+#include "logging.h"

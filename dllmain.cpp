@@ -1,7 +1,9 @@
 #include "includes.h"
+#include "logging.h"
 
 DWORD WINAPI Setup( LPVOID instance ) {
 	try {
+		gLogger.attach("family-addon");
 		g_memory.init( );
 		g_gui.init( );
 		g_hooks.init( );
@@ -17,6 +19,7 @@ DWORD WINAPI Setup( LPVOID instance ) {
 		std::this_thread::sleep_for( std::chrono::milliseconds( 200 ) );
 
 UNLOAD :
+	gLogger.detach();
 	g_hooks.destroy( );
 	g_gui.Destroy( );
 	FreeLibraryAndExitThread( static_cast< HMODULE >( instance ), EXIT_SUCCESS );

@@ -168,6 +168,7 @@
     <ClInclude Include="imstb_truetype.h" />
     <ClInclude Include="includes.h" />
     <ClInclude Include="json.h" />
+    <ClInclude Include="logging.h" />
     <ClInclude Include="memory.h" />
     <ClInclude Include="MinHook.h" />
     <ClInclude Include="pstdint.h" />
