@@ -20,13 +20,21 @@ public:
     inline static ResetFn ResetOriginal = nullptr;
     static HRESULT __stdcall Reset( IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params ) noexcept;
 
-    using CheckboxCtorFn = void( __thiscall* )( Checkbox* );
-    inline static CheckboxCtorFn OriginalCheckboxCtor = nullptr;
-    static void __fastcall CheckboxCtorHook( Checkbox* thisPtr );
-
     using Checkbox__ThinkFn = void(__thiscall*)(Checkbox*);
     inline static Checkbox__ThinkFn oCheckbox__Think = nullptr;
     static void __fastcall Checkbox__Think(Checkbox* ecx);
+
+    using Dropdown__ThinkFn = void( __thiscall* )( Dropdown* );
+    inline static Dropdown__ThinkFn oDropdown__Think = nullptr;
+    static void __fastcall Dropdown__Think( Dropdown* ecx );
+
+    using MultiDropdown__ThinkFn = void( __thiscall* )( MultiDropdown* );
+    inline static MultiDropdown__ThinkFn oMultiDropdown__Think = nullptr;
+    static void __fastcall MultiDropdown__Think( MultiDropdown* ecx );
+
+    using Slider__ThinkFn = void( __thiscall* )( Slider * );
+    inline static Slider__ThinkFn oSlider__Think = nullptr;
+    static void __fastcall Slider__Think( Slider* ecx );
 
     // funcs
 
@@ -35,3 +43,6 @@ public:
 
 extern Hooks g_hooks;
 extern std::unordered_set<Checkbox*> g_checkboxInstances;
+extern std::unordered_set<Dropdown*> g_dropdownInstances;
+extern std::unordered_set<MultiDropdown*> g_multiDropdownInstances;
+extern std::unordered_set<Slider*> g_sliderInstances;

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 struct GameString
 {
@@ -77,3 +77,30 @@ public:
     int enabled;              // 0xD4 (based on CE view)
     char pad2[ 0x28 ];          // padding until next pointer/field
 }; // ends around 0xF0
+
+class Dropdown : public Element {
+public:
+    int open;               // 0xD4: Dropdown open/closed state
+    char pad1[ 0x28 ];
+    int selected_index;     // 0x100: Selected index value ← YOUR NEW FINDING
+}; // ends around 0xF0
+
+class MultiDropdown : public Element {
+public:
+    int open;               // 0xD4
+    char pad1[ 0x28 ];
+    int selected_index;     // 0x100 (seems UI-specific)
+
+    // Very likely here:
+    struct {
+        size_t* first;      // pointer to array of active indices
+        size_t* last;       // one past last
+        size_t* end;        // end of allocated
+    } m_active_items;       // ~0x104 or 0x108
+};
+
+class Slider : public Element {
+public:
+    int enabled;              // 0xD4 (based on CE view)
+    char pad2[ 0x28 ];          // padding until next pointer/field
+}; // ends 

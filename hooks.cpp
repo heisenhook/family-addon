@@ -12,6 +12,9 @@
 
 Hooks g_hooks{ };
 std::unordered_set<Checkbox*> g_checkboxInstances;
+std::unordered_set<Dropdown*> g_dropdownInstances;
+std::unordered_set<MultiDropdown*> g_multiDropdownInstances;
+std::unordered_set<Slider*> g_sliderInstances;
 
 struct WatcherParams {
     uintptr_t idaFunctionVA;
@@ -84,6 +87,7 @@ static DWORD WINAPI ModuleWatcherThreadProc( LPVOID lpParam ) {
     }
 
     // Create the hook for Checkbox ctor
+    /*
     if ( MH_CreateHook( reinterpret_cast< LPVOID >( runtimeAddr ),
         &Hooks::CheckboxCtorHook,
         reinterpret_cast< void** >( &Hooks::OriginalCheckboxCtor ) ) != MH_OK ) {
@@ -93,6 +97,7 @@ static DWORD WINAPI ModuleWatcherThreadProc( LPVOID lpParam ) {
         delete p;
         return 1;
     }
+    */
 
     // enable hooks now (enable all hooks)
     if ( MH_EnableHook( MH_ALL_HOOKS ) != MH_OK ) {
@@ -117,8 +122,17 @@ void Hooks::init( ) {
 	if ( MH_CreateHook( g_memory.Get( g_gui.device, 16 ), &Reset, reinterpret_cast< void** >( &ResetOriginal ) ) )
 		throw std::runtime_error( "Unable to hook Reset()" );
 
-    if (MH_CreateHook(g_memory.PatternScan("HisHolySpiritOurLordAndSaviorJesusChrist.dll", "55 8B EC 83 EC 08 56 8B  F1 80 BE 8D 00 00 00 00"), &Checkbox__Think, reinterpret_cast<void**>(&oCheckbox__Think)))
+    if (MH_CreateHook(g_memory.PatternScan("HisHolySpiritOurLordAndSaviorJesusChrist.dll", "55 8B EC 83 EC ? 56 8B F1 80 BE 8D 00 00 00 ?"), &Checkbox__Think, reinterpret_cast<void**>(&oCheckbox__Think)))
         throw std::runtime_error("Unable to hook Checkbox::Think()");
+    
+    if ( MH_CreateHook( g_memory.PatternScan( "HisHolySpiritOurLordAndSaviorJesusChrist.dll", "55 8B EC 83 EC ? 56 8B F1 57 8B 86 F0 00 00 00 8B 8E F4 00 00 00 3B C1 0F 84 ? ? ? ? 2B C8 B8 ? ? ? ? F7 E9 C5 F8 57 C0 8B 0D ? ? ? ? C1 FA ? 8B FA C1 EF ? 8B 01 03 FA C1 E7 ? C5 FA 2A C7 C5 FA 5E 05 ? ? ? ? 8B 40 30 89 45 FC C5 FA 11 45 F8 FF 55 FC D9 ? ? C5 FA 10 45 FC C5 E8 57 D2 C5 F8 2F C2 76 ? 8B 0D ? ? ? ? 8B 01 8B 40 30 89 45 FC FF 55 FC D9 ? ? C5 FA 10 4D FC C5 E8 57 D2 EB ? C5 FA 10 0D ? ? ? ? A1 ? ? ? ? 8D 8E FC 00 00 00" ), &Dropdown__Think, reinterpret_cast< void** >( &oDropdown__Think ) ) )
+        throw std::runtime_error( "Unable to hook Dropdown::Think()" );
+
+    if ( MH_CreateHook( g_memory.PatternScan( "HisHolySpiritOurLordAndSaviorJesusChrist.dll", "55 8B EC 83 EC ? 56 8B F1 57 8B 86 F0 00 00 00 8B 8E F4 00 00 00 3B C1 0F 84 ? ? ? ? 2B C8 B8 ? ? ? ? F7 E9 C5 F8 57 C0 8B 0D ? ? ? ? C1 FA ? 8B FA C1 EF ? 8B 01 03 FA C1 E7 ? C5 FA 2A C7 C5 FA 5E 05 ? ? ? ? 8B 40 30 89 45 FC C5 FA 11 45 F8 FF 55 FC D9 ? ? C5 FA 10 45 FC C5 E8 57 D2 C5 F8 2F C2 76 ? 8B 0D ? ? ? ? 8B 01 8B 40 30 89 45 FC FF 55 FC D9 ? ? C5 FA 10 4D FC C5 E8 57 D2 EB ? C5 FA 10 0D ? ? ? ? A1 ? ? ? ? 8D 8E 0C 01 00 00" ), &MultiDropdown__Think, reinterpret_cast< void** >( &oMultiDropdown__Think ) ) )
+        throw std::runtime_error( "Unable to hook MultiDropdown::Think()" );
+
+    if ( MH_CreateHook( g_memory.PatternScan( "HisHolySpiritOurLordAndSaviorJesusChrist.dll", "55 8B EC 83 EC ? 53 56 8B F1 C5 F0 57 C9" ), &Slider__Think, reinterpret_cast< void** >( &oSlider__Think ) ) )
+        throw std::runtime_error( "Unable to hook Slider::Think()" );
 
 
 	// AllocKeyValuesMemory hook
@@ -173,20 +187,43 @@ HRESULT __stdcall Hooks::Reset( IDirect3DDevice9* device, D3DPRESENT_PARAMETERS*
 	return result;
 }
 
-void __fastcall Hooks::CheckboxCtorHook( Checkbox* thisPtr ) {
-    // Call the original constructor so object is properly initialized.
-    //if ( OriginalCheckboxCtor )
-    //    OriginalCheckboxCtor( thisPtr );
-
-    // Store instance in global vector
-    //g_checkboxInstances.push_back( thisPtr );
-}
-
 void __fastcall Hooks::Checkbox__Think(Checkbox* ecx) {
-
     // if it already existed, not inserted -> just call original
     if (!(g_checkboxInstances.find(ecx) != g_checkboxInstances.end())) {
         Log() << "Found checkbox " << ecx->label().c_str() << " at " << std::format("{:X}", (DWORD)ecx);
+    }
+
+    auto [it, inserted] = g_checkboxInstances.insert(ecx);
+
+    return oCheckbox__Think( ecx );
+}
+
+void __fastcall Hooks::Dropdown__Think( Dropdown* ecx ) {
+    // if it already existed, not inserted -> just call original
+    if ( !( g_dropdownInstances.find( ecx ) != g_dropdownInstances.end( ) ) ) {
+        Log( ) << "Found dropdown " << ecx->label( ).c_str( ) << " at " << std::format( "{:X}", ( DWORD )ecx );
+    }
+
+    auto [it, inserted] = g_dropdownInstances.insert( ecx );
+
+    return oDropdown__Think( ecx );
+}
+
+void __fastcall Hooks::MultiDropdown__Think( MultiDropdown* ecx ) {
+    // if it already existed, not inserted -> just call original
+    if ( !( g_multiDropdownInstances.find( ecx ) != g_multiDropdownInstances.end( ) ) ) {
+        Log( ) << "Found multidropdown " << ecx->label( ).c_str( ) << " at " << std::format( "{:X}", ( DWORD )ecx );
+    }
+
+    auto [it, inserted] = g_multiDropdownInstances.insert( ecx );
+
+    return oMultiDropdown__Think( ecx );
+}
+
+void __fastcall Hooks::Slider__Think( Slider* ecx ) {
+    // if it already existed, not inserted -> just call original
+    if ( !( g_sliderInstances.find( ecx ) != g_sliderInstances.end( ) ) ) {
+        Log( ) << "Found slider " << ecx->label( ).c_str( ) << " at " << std::format( "{:X}", ( DWORD )ecx );
 
         /*
         if ( ecx->m_parent && ecx->m_parent->m_active_tab ) {
@@ -194,10 +231,9 @@ void __fastcall Hooks::Checkbox__Think(Checkbox* ecx) {
             auto lol = tab->m_title; // you can log / debug here
         }
         */
-
     }
 
-    auto [it, inserted] = g_checkboxInstances.insert(ecx);
+    auto [it, inserted] = g_sliderInstances.insert( ecx );
 
-    return oCheckbox__Think( ecx );
+    return oSlider__Think( ecx );
 }
