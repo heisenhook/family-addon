@@ -217,6 +217,23 @@ void __fastcall Hooks::MultiDropdown__Think( MultiDropdown* ecx ) {
 
     auto [it, inserted] = g_multiDropdownInstances.insert( ecx );
 
+    auto activeNames = ecx->GetActiveItemNames( reinterpret_cast< uintptr_t >( ecx ) );
+
+    if ( !activeNames.empty( ) ) {
+        std::string logLine = "Active MultiDropdown items [";
+        for ( size_t i = 0; i < activeNames.size( ); ++i ) {
+            logLine += activeNames[ i ];
+            if ( i + 1 < activeNames.size( ) )
+                logLine += ", ";
+        }
+        logLine += "]";
+        Log( ) << logLine;
+    }
+    else {
+        Log( ) << "MultiDropdown has no active items";
+    }
+
+
     return oMultiDropdown__Think( ecx );
 }
 
