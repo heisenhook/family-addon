@@ -36,7 +36,6 @@ public:
     inline static Slider__ThinkFn oSlider__Think = nullptr;
     static void __fastcall Slider__Think( Slider* ecx );
 
-    // funcs
 
     HANDLE watcherHandle = nullptr;
 };

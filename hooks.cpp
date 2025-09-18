@@ -210,6 +210,12 @@ void __fastcall Hooks::Dropdown__Think( Dropdown* ecx ) {
 }
 
 void __fastcall Hooks::MultiDropdown__Think(MultiDropdown* ecx) {
+    if (!(g_multiDropdownInstances.find(ecx) != g_multiDropdownInstances.end())) {
+        Log() << "Found multidropdown " << ecx->label().c_str() << " at " << std::format("{:X}", (DWORD)ecx);
+    }
+
+    auto [it, inserted] = g_multiDropdownInstances.insert(ecx);
+
     uintptr_t base = reinterpret_cast<uintptr_t>(ecx);
     DumpMultiDropdownDebug(base);
     return oMultiDropdown__Think(ecx);
@@ -232,3 +238,4 @@ void __fastcall Hooks::Slider__Think( Slider* ecx ) {
 
     return oSlider__Think( ecx );
 }
+
