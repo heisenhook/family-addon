@@ -1,4 +1,7 @@
 ﻿#pragma once
+#include "logging.h"
+#include <sstream>
+#include <iomanip>
 
 // helper small vector view for x86 pointer-sized entries
 struct VectorView {
@@ -8,11 +11,32 @@ struct VectorView {
     size_t count( ) const { return ( last - first ); } // number of entries
 };
 
+template<typename T>
 struct RawVector {
-    uintptr_t _Myfirst;   // pointer (address of element 0)
-    uintptr_t _Mylast;    // pointer (one past last)
-    uintptr_t _Myend;     // pointer (capacity end)
+    T* first;
+    T* last;
+    T* capacity;
+
+    size_t size() const {
+        return (last && first) ? (last - first) : 0;
+    }
+
+    T& operator[](size_t i) {
+        return first[i];
+    }
+    const T& operator[](size_t i) const {
+        return first[i];
+    }
+
+    bool valid() const {
+        return first != nullptr && last != nullptr && last >= first;
+    }
 };
+
+static RawVector<size_t>& GetActiveIndicesRef(uintptr_t multiBase) {
+    // m_active_items is at offset 0x110
+    return *reinterpret_cast<RawVector<size_t>*>(multiBase + 0x110);
+}
 
 // read-only SSO-friendly string view (minimal, to display)
 struct GameStringView {
@@ -107,143 +131,226 @@ public:
 
 class MultiDropdown : public Element {
 public:
-    // Element base fields are before 0xD4 (not repeated here)
-    // 0xD4: open flag (byte)
+    // 0xD4: open flag (1 byte)
     uint8_t m_open;              // 0xD4
-    uint8_t pad_after_open[ 0xF0 - 0xD5 ];
+    uint8_t pad_after_open[0xF0 - 0xD5];
 
-    // 0xF0: m_items vector<string> (first,last,end)
-    RawVector m_items;           // at 0xF0 (first=_Myfirst, last=_Mylast, end=_Myend)
-    // Each string object size = 24 bytes -> count = (last-first)/24
+    // 0xF0: m_items vector<GameString> (RawVector<GameString>)
+    RawVector<GameString> m_items;   // _Myfirst/_Mylast/_Myend stored at 0xF0..0xFB
 
-// there are more fields 0xF8..0x10B (label, base h, etc) - we skip to known ones
-    uint8_t pad_to_anim[ 0x10C - ( 0xF0 + sizeof( RawVector ) ) ];
+    // padding until 0x10C (there are other fields here in the real class)
+    uint8_t pad_to_anim[0x10C - (0xF0 + sizeof(RawVector<GameString>))];
 
     // 0x10C: animation height / progress (float)
     float m_anim_height;         // 0x10C
 
-    // 0x110: m_active_items vector<size_t>
-    RawVector m_active_items;    // _Myfirst/_Mylast/_Myend at 0x110/0x114/0x118
-    // For this build size_t == 4 => count = (last-first)/4
+    // padding until 0x110
+    // uint8_t pad_to_active[0x110 - (0x10C + sizeof(float))];
 
-// 0x11C: pointer used by think() (treated as pointer; follow it in CE)
-    uintptr_t m_some_ptr;        // 0x11C  (interpreted as pointer in the code)
-    int m_sentinel;              // 0x120 (constructor sets 0xFFFFFFFF)
+    // 0x110: m_active_items vector<size_t> (x86 size_t == uint32_t)
+    RawVector<GameString> m_active_items; // _Myfirst/_Mylast/_Myend at 0x110..0x11B
 
-public:
+    // 0x11C: some pointer used by think() (interpreted in IDA as pointer)
+    uintptr_t m_some_ptr;        // 0x11C
 
-    inline std::string ReadStdStringAtAddr( uintptr_t addr ) {
-        if ( !addr )
-            return {};
+    // 0x120: sentinel (constructor sets 0xFFFFFFFF)
+    int m_sentinel;              // 0x120
+};
 
-        // interpret the address as GameString
-        const GameString* gs = reinterpret_cast< const GameString* >( addr );
-        // validate length
-        if ( gs->length < 0 || gs->length > 0x10000 ) // arbitrary sanity check
-            return {};
+// ------------------------ Helper functions (free / inline) ------------------------
 
-        return gs->to_std( );
+// Safe reader of "GameString" object placed at `addr` (addr points at the GameString object)
+static inline std::string ReadStdStringAtAddr(uintptr_t addr) {
+    if (!addr) return {};
+    const GameString* gs = reinterpret_cast<const GameString*>(addr);
+    // sanity checks
+    if (gs->length < 0 || gs->length > 0x10000) return {};
+    // if SSO or heap pointer missing this still works (c_str handles it)
+    return gs->to_std();
+}
+
+// Read a RawVector<T> stored at base + offset (2 pointers for x86: first,last)
+// returns true and fills out_first/out_last if successful.
+static inline bool read_raw_vector_ptrs(uintptr_t base, uint32_t offset, uintptr_t& out_first, uintptr_t& out_last) {
+    __try {
+        out_first = *reinterpret_cast<uint32_t*>(base + offset);
+        out_last = *reinterpret_cast<uint32_t*>(base + offset + 4);
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) {
+        out_first = out_last = 0;
+        return false;
+    }
+}
+
+// Read active indices from m_active_items (offset 0x110). Returns vector of indices.
+static inline std::vector<size_t> ReadActiveIndices(uintptr_t multiBase) {
+    uintptr_t first = 0, last = 0;
+    if (!read_raw_vector_ptrs(multiBase, 0x110, first, last)) return {};
+    if (!first || !last || last <= first) return {};
+    size_t count = (last - first) / sizeof(uint32_t); // x86: 4-byte entries
+    std::vector<size_t> out;
+    out.reserve(count);
+    uint32_t* arr = reinterpret_cast<uint32_t*>(first);
+    for (size_t i = 0; i < count; ++i) out.push_back(static_cast<size_t>(arr[i]));
+    return out;
+}
+
+// Read item string at index from m_items vector (offset 0xF0). Each element is a GameString object (24 bytes typical on x86)
+static inline std::string ReadItemStringAtIndex(uintptr_t multiBase, size_t index) {
+    uintptr_t items_first = 0, items_last = 0;
+    if (!read_raw_vector_ptrs(multiBase, 0xF0, items_first, items_last)) return {};
+    if (!items_first || !items_last || items_last <= items_first) return {};
+    const size_t elementSize = sizeof(GameString); // should be 24 on x86; this keeps it portable to your struct
+    size_t item_count = (items_last - items_first) / elementSize;
+    if (index >= item_count) return {};
+    uintptr_t string_obj_addr = items_first + index * elementSize;
+    return ReadStdStringAtAddr(string_obj_addr);
+}
+
+// Get names of active items as strings
+static inline std::vector<std::string> GetActiveItemNames(uintptr_t multiBase) {
+    auto indices = ReadActiveIndices(multiBase);
+    std::vector<std::string> out;
+    out.reserve(indices.size());
+    for (auto idx : indices) {
+        auto s = ReadItemStringAtIndex(multiBase, idx);
+        out.push_back(std::move(s));
+    }
+    return out;
+}
+
+// Safe read of a GameString located at addr (addr -> GameString object)
+static inline std::string ReadStdStringAtAddrSafe(uintptr_t addr) {
+    if (!addr) return {};
+    __try {
+        const GameString* gs = reinterpret_cast<const GameString*>(addr);
+        if (gs->length < 0 || gs->length > 0x10000) return {};
+        return gs->to_std();
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) {
+        return {};
+    }
+}
+
+// Read raw pair (first,last) from vector-like structure at base+offset (x86)
+static inline bool ReadVectorFirstLast(uintptr_t base, uint32_t offset, uintptr_t& out_first, uintptr_t& out_last, uintptr_t& out_cap) {
+    out_first = out_last = out_cap = 0;
+    __try {
+        out_first = static_cast<uintptr_t>(*reinterpret_cast<uint32_t*>(base + offset));
+        out_last = static_cast<uintptr_t>(*reinterpret_cast<uint32_t*>(base + offset + 4));
+        out_cap = static_cast<uintptr_t>(*reinterpret_cast<uint32_t*>(base + offset + 8));
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) {
+        return false;
+    }
+}
+
+// Read active indices from m_active_items at offset 0x110
+static inline std::vector<uint32_t> ReadActiveIndicesSafe(uintptr_t multiBase) {
+    uintptr_t first = 0, last = 0, cap = 0;
+    if (!ReadVectorFirstLast(multiBase, 0x110, first, last, cap)) return {};
+    if (!first || !last || last <= first) return {};
+    size_t count = (last - first) / sizeof(uint32_t);
+    std::vector<uint32_t> out;
+    out.reserve(count);
+    __try {
+        uint32_t* arr = reinterpret_cast<uint32_t*>(first);
+        for (size_t i = 0; i < count; ++i) out.push_back(arr[i]);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) {
+        out.clear();
+    }
+    return out;
+}
+
+// Read item strings from m_items vector at offset 0xF0. Each element is GameString (24 bytes on x86)
+static inline std::string ReadItemStringAtIndexSafe(uintptr_t multiBase, size_t index) {
+    uintptr_t first = 0, last = 0, cap = 0;
+    if (!ReadVectorFirstLast(multiBase, 0xF0, first, last, cap)) return {};
+    if (!first || !last || last <= first) return {};
+    const size_t elementSize = sizeof(GameString); // expected 24
+    size_t count = (last - first) / elementSize;
+    if (index >= count) return {};
+    uintptr_t elemAddr = first + index * elementSize;
+    return ReadStdStringAtAddrSafe(elemAddr);
+}
+
+// Dump everything: addresses, counts, items and active indices
+static inline void DumpMultiDropdownDebug(uintptr_t multiBase) {
+    if (!multiBase) { Log() << "DumpMultiDropdownDebug: null base"; return; }
+
+    // layout checks (logs only)
+    std::ostringstream ss;
+    ss << std::hex << "MultiDropdown @ 0x" << multiBase << std::dec << "\n";
+
+    // read items vector
+    uintptr_t items_first = 0, items_last = 0, items_cap = 0;
+    if (ReadVectorFirstLast(multiBase, 0xF0, items_first, items_last, items_cap)) {
+        size_t item_count = (items_last > items_first) ? (items_last - items_first) / sizeof(GameString) : 0;
+        ss << " m_items.first=0x" << std::hex << items_first
+            << " last=0x" << items_last << " cap=0x" << items_cap
+            << " count=" << std::dec << item_count << "\n";
+
+        for (size_t i = 0; i < item_count; ++i) {
+            uintptr_t objAddr = items_first + i * sizeof(GameString);
+            std::string s = ReadStdStringAtAddrSafe(objAddr);
+            ss << "  [" << i << "] addr=0x" << std::hex << objAddr << std::dec << " '" << (s.empty() ? "<empty>" : s) << "'\n";
+        }
+    }
+    else {
+        ss << " m_items: failed to read vector pointers at 0xF0\n";
     }
 
-    // read_vector_from_raw: returns {first,last} as pointers (safe)
-    static bool read_raw_vector( uintptr_t base, uint32_t offset, uintptr_t& out_first, uintptr_t& out_last ) {
+    // read active indices
+    uintptr_t act_first = 0, act_last = 0, act_cap = 0;
+    if (ReadVectorFirstLast(multiBase, 0x110, act_first, act_last, act_cap)) {
+        size_t active_count = (act_last > act_first) ? (act_last - act_first) / sizeof(uint32_t) : 0;
+        ss << " m_active_items.first=0x" << std::hex << act_first
+            << " last=0x" << act_last << " cap=0x" << act_cap
+            << " count=" << std::dec << active_count << "\n";
+
+        // print indices
         __try {
-            out_first = *reinterpret_cast< uint32_t* >( base + offset );
-            out_last = *reinterpret_cast< uint32_t* >( base + offset + 4 );
-            return true;
-        }
-        __except ( EXCEPTION_EXECUTE_HANDLER ) {
-            out_first = out_last = 0;
-            return false;
-        }
-    }
-
-    // read active indices (size_t/int)
-    std::vector<size_t> ReadActiveIndices( uintptr_t multiBase ) {
-        uintptr_t first = 0, last = 0;
-        if ( !read_raw_vector( multiBase, 0x110, first, last ) )
-            return {};
-        if ( !first || !last || last <= first ) return {};
-        size_t count = ( last - first ) / sizeof( uint32_t ); // x86: 4 bytes
-        std::vector<size_t> out;
-        out.reserve( count );
-        uint32_t* arr = reinterpret_cast< uint32_t* >( first );
-        for ( size_t i = 0; i < count; ++i )
-            out.push_back( static_cast< size_t >( arr[ i ] ) );
-
-        return out;
-    }
-
-    // read items (vector<std::string>) and get string at index
-    std::string ReadItemStringAtIndex( uintptr_t multiBase, size_t index ) {
-        uintptr_t items_first = 0, items_last = 0;
-        if ( !read_raw_vector( multiBase, 0xF0, items_first, items_last ) ) return {};
-        if ( !items_first || !items_last || items_last <= items_first ) return {};
-        size_t item_count = ( items_last - items_first ) / 24; // 24 bytes per std::string
-        if ( index >= item_count ) return {};
-        uintptr_t string_obj_addr = items_first + index * 24;
-        // Use your GameString reader here: if string_obj_addr points to std::string object,
-        // you may need to parse the std::string structure. If you implemented ReadStdStringAtAddr(addr) that reads the std::string at addr, call it:
-        return ReadStdStringAtAddr( string_obj_addr );
-    }
-
-    // get list of selected item strings
-    std::vector<std::string> GetActiveItemNames( uintptr_t multiBase ) {
-        auto indices = ReadActiveIndices( multiBase );
-        std::vector<std::string> out;
-        for ( auto idx : indices ) {
-            auto s = ReadItemStringAtIndex( multiBase, idx );
-            if ( !s.empty( ) ) out.push_back( std::move( s ) );
-        }
-        return out;
-    }
-
-    // get item index by name
-    size_t GetItemIndexByName( const std::string& name ) {
-        if ( !this ) return ( size_t )-1;
-
-        RawVector& items = this->m_items;
-        size_t count = ( items._Mylast - items._Myfirst ) / 24; // 24 bytes per GameString
-
-        for ( size_t i = 0; i < count; ++i ) {
-            uintptr_t addr = items._Myfirst + i * 24;
-            GameString* gs = reinterpret_cast< GameString* >( addr );
-            if ( gs->to_std( ) == name ) {
-                return i;
+            uint32_t* arr = reinterpret_cast<uint32_t*>(act_first);
+            for (size_t i = 0; i < active_count; ++i) {
+                uint32_t idx = arr[i];
+                std::string s = ReadItemStringAtIndexSafe(multiBase, idx);
+                ss << "  active[" << i << "] = idx=" << idx << " -> '" << (s.empty() ? "<invalid-or-empty>" : s) << "'\n";
             }
         }
-
-        return ( size_t )-1; // not found
-    }
-
-    // add item to list
-    void AddActiveItem( const std::string& name ) {
-        if ( !this ) return;
-
-        size_t idx = GetItemIndexByName( name );
-        if ( idx == ( size_t )-1 ) return; // item not found
-
-        RawVector& active = this->m_active_items;
-        uint32_t* data = reinterpret_cast< uint32_t* >( active._Myfirst );
-
-        // check if already active
-        size_t currentCount = ( active._Mylast - active._Myfirst ) / sizeof( uint32_t );
-        for ( size_t i = 0; i < currentCount; ++i ) {
-            if ( data[ i ] == idx ) return; // already active
+        __except (EXCEPTION_EXECUTE_HANDLER) {
+            ss << "  (exception while reading active array)\n";
         }
 
-        // append new index if space
-        size_t capacity = ( active._Myend - active._Myfirst ) / sizeof( uint32_t );
-        if ( currentCount < capacity ) {
-            data[ currentCount ] = static_cast< uint32_t >( idx );
-            active._Mylast = active._Myfirst + ( currentCount + 1 ) * sizeof( uint32_t );
-        }
+    }
+    else {
+        ss << " m_active_items: failed to read vector pointers at 0x110\n";
     }
 
-};
+    // log m_open and other small fields
+    __try {
+        uint8_t m_open = *reinterpret_cast<uint8_t*>(multiBase + 0xD4);
+        uint32_t some_ptr = *reinterpret_cast<uint32_t*>(multiBase + 0x11C);
+        int sentinel = *reinterpret_cast<int*>(multiBase + 0x120);
+        ss << std::hex << " m_open=" << static_cast<int>(m_open) << " m_some_ptr=0x" << some_ptr << " sentinel=0x" << sentinel << "\n";
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) {
+        ss << " failed to read m_open / other small fields\n";
+    }
+
+    Log() << ss.str();
+}
 
 class Slider : public Element {
 public:
     int enabled;              // 0xD4 (based on CE view)
     char pad2[ 0x28 ];          // padding until next pointer/field
+    float value;     // 0x100: Selected index value ← YOUR NEW FINDING
 }; // ends 
+
+static_assert(sizeof(GameString) <= 32, "Expect GameString small (SSO) on x86 builds");
+static_assert(sizeof(GameString) == 24, "Expect GameString == 24 on x86");
+static_assert(sizeof(uintptr_t) == 4, "Expect 32-bit build");
+static_assert(sizeof(RawVector<GameString>) == 12, "RawVector must be 12 bytes on x86");

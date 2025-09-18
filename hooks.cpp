@@ -199,7 +199,7 @@ void __fastcall Hooks::Checkbox__Think(Checkbox* ecx) {
 }
 
 void __fastcall Hooks::Dropdown__Think( Dropdown* ecx ) {
-    // if it already existed, not inserted -> just call original
+    // if it already existed, not inserted -> just call original 
     if ( !( g_dropdownInstances.find( ecx ) != g_dropdownInstances.end( ) ) ) {
         Log( ) << "Found dropdown " << ecx->label( ).c_str( ) << " at " << std::format( "{:X}", ( DWORD )ecx );
     }
@@ -209,32 +209,10 @@ void __fastcall Hooks::Dropdown__Think( Dropdown* ecx ) {
     return oDropdown__Think( ecx );
 }
 
-void __fastcall Hooks::MultiDropdown__Think( MultiDropdown* ecx ) {
-    // if it already existed, not inserted -> just call original
-    if ( !( g_multiDropdownInstances.find( ecx ) != g_multiDropdownInstances.end( ) ) ) {
-        Log( ) << "Found multidropdown " << ecx->label( ).c_str( ) << " at " << std::format( "{:X}", ( DWORD )ecx );
-    }
-
-    auto [it, inserted] = g_multiDropdownInstances.insert( ecx );
-
-    auto activeNames = ecx->GetActiveItemNames( reinterpret_cast< uintptr_t >( ecx ) );
-
-    if ( !activeNames.empty( ) ) {
-        std::string logLine = "Active MultiDropdown items [";
-        for ( size_t i = 0; i < activeNames.size( ); ++i ) {
-            logLine += activeNames[ i ];
-            if ( i + 1 < activeNames.size( ) )
-                logLine += ", ";
-        }
-        logLine += "]";
-        Log( ) << logLine;
-    }
-    else {
-        Log( ) << "MultiDropdown has no active items";
-    }
-
-
-    return oMultiDropdown__Think( ecx );
+void __fastcall Hooks::MultiDropdown__Think(MultiDropdown* ecx) {
+    uintptr_t base = reinterpret_cast<uintptr_t>(ecx);
+    DumpMultiDropdownDebug(base);
+    return oMultiDropdown__Think(ecx);
 }
 
 void __fastcall Hooks::Slider__Think( Slider* ecx ) {
