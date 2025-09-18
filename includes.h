@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <d3d9.h>
 
+#include "client.h"
 #include "hooks.h"
 #include "gui.h"
 #include "memory.h"

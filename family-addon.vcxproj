@@ -86,7 +86,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
@@ -152,6 +152,7 @@
     <ClInclude Include="address.h" />
     <ClInclude Include="base64.h" />
     <ClInclude Include="buffer.h" />
+    <ClInclude Include="client.h" />
     <ClInclude Include="color.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="FnvHash.h" />
@@ -183,6 +184,7 @@
   <ItemGroup>
     <ClCompile Include="address.cpp" />
     <ClCompile Include="buffer.c" />
+    <ClCompile Include="client.cpp" />
     <ClCompile Include="config.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="gui.cpp" />
