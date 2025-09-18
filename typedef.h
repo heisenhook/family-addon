@@ -345,8 +345,7 @@ static inline void DumpMultiDropdownDebug(uintptr_t multiBase) {
 
 class Slider : public Element {
 public:
-    int enabled;              // 0xD4 (based on CE view)
-    char pad2[ 0x28 ];          // padding until next pointer/field
+    bool drag;              // 0xD4 (based on CE view)
     float value;     // 0x100: Selected index value ← YOUR NEW FINDING
 }; // ends 
 
