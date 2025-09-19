@@ -194,10 +194,21 @@ HRESULT __stdcall Hooks::Reset( IDirect3DDevice9* device, D3DPRESENT_PARAMETERS*
 	return result;
 }
 
+std::vector<Tab*> tabs;
+std::vector<Element*> elements;
+
 void __fastcall Hooks::Checkbox__Think(Checkbox* ecx) {
     // if it already existed, not inserted -> just call original
     if (!(g_checkboxInstances.find(ecx) != g_checkboxInstances.end())) {
-        Log() << "Found checkbox " << ecx->label().c_str() << " at " << std::format("{:X}", (DWORD)ecx);
+        //Log() << "Found checkbox " << ecx->label().c_str() << " at " << std::format("{:X}", (DWORD)ecx);
+        tabs = ecx->m_parent->GetTabs();
+        for (auto tab : tabs) {
+            if (tab) {
+                for (auto e : tab->GetElements()) {
+                    elements.push_back(e);
+                }
+            }
+        }
     }
 
     auto [it, inserted] = g_checkboxInstances.insert(ecx);
@@ -208,7 +219,7 @@ void __fastcall Hooks::Checkbox__Think(Checkbox* ecx) {
 void __fastcall Hooks::Dropdown__Think( Dropdown* ecx ) {
     // if it already existed, not inserted -> just call original 
     if ( !( g_dropdownInstances.find( ecx ) != g_dropdownInstances.end( ) ) ) {
-        Log( ) << "Found dropdown " << ecx->label( ).c_str( ) << " at " << std::format( "{:X}", ( DWORD )ecx );
+        //Log( ) << "Found dropdown " << ecx->label( ).c_str( ) << " at " << std::format( "{:X}", ( DWORD )ecx );
     }
 
     auto [it, inserted] = g_dropdownInstances.insert( ecx );
@@ -218,7 +229,7 @@ void __fastcall Hooks::Dropdown__Think( Dropdown* ecx ) {
 
 void __fastcall Hooks::MultiDropdown__Think(MultiDropdown* ecx) {
     if (!(g_multiDropdownInstances.find(ecx) != g_multiDropdownInstances.end())) {
-        Log() << "Found multidropdown " << ecx->label().c_str() << " at " << std::format("{:X}", (DWORD)ecx);
+        //Log() << "Found multidropdown " << ecx->label().c_str() << " at " << std::format("{:X}", (DWORD)ecx);
     }
 
     auto [it, inserted] = g_multiDropdownInstances.insert(ecx);
@@ -231,7 +242,7 @@ void __fastcall Hooks::MultiDropdown__Think(MultiDropdown* ecx) {
 void __fastcall Hooks::Slider__Think( Slider* ecx ) {
     // if it already existed, not inserted -> just call original
     if ( !( g_sliderInstances.find( ecx ) != g_sliderInstances.end( ) ) ) {
-        Log( ) << "Found slider " << ecx->label( ).c_str( ) << " at " << std::format( "{:X}", ( DWORD )ecx );
+        //Log( ) << "Found slider " << ecx->label( ).c_str( ) << " at " << std::format( "{:X}", ( DWORD )ecx );
 
         /*
         if ( ecx->m_parent && ecx->m_parent->m_active_tab ) {

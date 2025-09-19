@@ -52,8 +52,8 @@ struct GameString
         char* heapPtr;      // Used when string is too large for SSO
     };
 
-    int length;             // Number of characters in use
-    int capacity;           // Buffer size (without null terminator)
+    unsigned int length;             // Number of characters in use
+    unsigned int capacity;           // Buffer size (without null terminator)
 
     // Helper to get a readable C-string
     const char* c_str( ) const
@@ -70,91 +70,6 @@ struct GameString
     {
         return std::string( c_str( ), length );
     }
-};
-
-class Tab;
-class Element;
-class Form {
-public:
-    /*0x00*/ double m_opacity;       // 8 bytes
-    /*0x08*/ int one;
-    /*0x0C*/ int two;
-    /*0x10*/ int three;
-    /*0x14*/ int m_x;
-    /*0x18*/ int m_y;
-    /*0x1C*/ int m_width;
-    /*0x20*/ int m_height;
-    /*0x24*/ int m_tick;
-    /*0x28*/ std::vector<Tab*> m_tabs; // 0x0C (32-bit!)
-    /*0x34*/ char pad01[ 0x1C ];        // to reach 0x50
-    /*0x50*/ int m_tab_count;
-    /*0x54*/ Tab* m_active_tab;
-    /*0x58*/ Element* m_active_element;
-};
-
-class Tab {
-public:
-    /*0x00*/ char m_title[ 0x18 ];  // fixed-size char array
-    /*0x18*/ int one;
-    /*0x1C*/ std::vector<Element*> m_elements; // 0x0C
-};
-
-class Element {
-public:
-private:
-    char pad0[ 0x28 ];
-public:
-    // void* m_parent;
-    GameString m_label;
-    GameString m_file_id;
-private:
-    char pad1[ 0x7C ];
-
-public:
-    // Accessors
-    std::string label( ) const { return m_label.to_std( ); }
-    std::string file_id( ) const { return m_file_id.to_std( ); }
-}; // total: 0xD4
-
-class Checkbox : public Element {
-public:
-    int enabled;              // 0xD4 (based on CE view)
-    char pad2[ 0x28 ];          // padding until next pointer/field
-}; // ends around 0xF0
-
-class Dropdown : public Element {
-public:
-    int open;               // 0xD4: Dropdown open/closed state
-    char pad1[ 0x28 ];
-    int selected_index;     // 0x100: Selected index value ← YOUR NEW FINDING
-}; // ends around 0xF0
-
-class MultiDropdown : public Element {
-public:
-    // 0xD4: open flag (1 byte)
-    uint8_t m_open;              // 0xD4
-    uint8_t pad_after_open[0xF0 - 0xD5];
-
-    // 0xF0: m_items vector<GameString> (RawVector<GameString>)
-    RawVector<GameString> m_items;   // _Myfirst/_Mylast/_Myend stored at 0xF0..0xFB
-
-    // padding until 0x10C (there are other fields here in the real class)
-    uint8_t pad_to_anim[0x10C - (0xF0 + sizeof(RawVector<GameString>))];
-
-    // 0x10C: animation height / progress (float)
-    float m_anim_height;         // 0x10C
-
-    // padding until 0x110
-    // uint8_t pad_to_active[0x110 - (0x10C + sizeof(float))];
-
-    // 0x110: m_active_items vector<size_t> (x86 size_t == uint32_t)
-    RawVector<GameString> m_active_items; // _Myfirst/_Mylast/_Myend at 0x110..0x11B
-
-    // 0x11C: some pointer used by think() (interpreted in IDA as pointer)
-    uintptr_t m_some_ptr;        // 0x11C
-
-    // 0x120: sentinel (constructor sets 0xFFFFFFFF)
-    int m_sentinel;              // 0x120
 };
 
 // ------------------------ Helper functions (free / inline) ------------------------
@@ -342,6 +257,136 @@ static inline void DumpMultiDropdownDebug(uintptr_t multiBase) {
 
     Log() << ss.str();
 }
+
+class Form;
+class Element {
+public:
+private:
+    char pad0[0x24];
+public:
+    Form* m_parent;
+    GameString m_label;
+    GameString m_file_id;
+private:
+    char pad1[0x7C];
+
+public:
+    // Accessors
+    std::string label() const { return m_label.to_std(); }
+    std::string file_id() const { return m_file_id.to_std(); }
+}; // total: 0xD4
+
+class Tab {
+public:
+    /*0x00*/ GameString m_title;  // fixed-size char array
+    /*0x18*/ int one;
+    /*0x1C*/ RawVector<Element*> m_elements; // 0x0C
+
+public:
+    std::vector<Element*> GetElements() {
+        uintptr_t first = 0, last = 0;
+        if (!read_raw_vector_ptrs((uintptr_t)this, 0x1C, first, last))
+            return {};
+
+        if (!first || !last || last <= first)
+            return {};
+
+        size_t count = (last - first) / sizeof(void*); // x86: 4-byte pointers
+        std::vector<Element*> out;
+        out.reserve(count);
+
+        for (size_t i = 0; i < count; ++i) {
+            uintptr_t element_address = first + i * sizeof(void*);
+            out.push_back(*reinterpret_cast<Element**>(element_address));
+            Element* e = *reinterpret_cast<Element**>(element_address);
+            if (reinterpret_cast<Element*>(element_address))
+                Log() << "Found element " << (*reinterpret_cast<Element**>(element_address))->m_file_id.c_str() << " at " << std::format("{:X}", (DWORD)element_address);
+        }
+
+        return out;
+    }
+};
+
+class Form {
+public:
+    /*0x00*/ double m_opacity;       // 8 bytes
+    /*0x08*/ int one;
+    /*0x0C*/ int two;
+    /*0x10*/ int three;
+    /*0x14*/ int m_x;
+    /*0x18*/ int m_y;
+    /*0x1C*/ int m_width;
+    /*0x20*/ int m_height;
+    /*0x24*/ int m_tick;
+    /*0x28*/ RawVector<Tab*> m_tabs; // 0x0C (32-bit!)
+    /*0x34*/ char pad01[ 0x1C ];        // to reach 0x50
+    /*0x50*/ int m_tab_count;
+    /*0x54*/ Tab* m_active_tab;
+    /*0x58*/ Element* m_active_element;
+public:
+    std::vector<Tab*> GetTabs() {
+        uintptr_t first = 0, last = 0;
+        if (!read_raw_vector_ptrs((uintptr_t)this, 0x28, first, last))
+            return {};
+
+        if (!first || !last || last <= first)
+            return {};
+
+        size_t count = (last - first) / sizeof(void*); // x86: 4-byte pointers
+        std::vector<Tab*> out;
+        out.reserve(count);
+
+        for (size_t i = 0; i < count; ++i) {
+            uintptr_t tab_address = first + i * sizeof(void*);
+            out.push_back(*reinterpret_cast<Tab**>(tab_address));
+            if (reinterpret_cast<Tab*>(tab_address))
+                Log() << "Found tab " << reinterpret_cast<Tab*>(tab_address)->m_title.c_str() << " at " << std::format("{:X}", (DWORD)tab_address);
+        }
+
+        return out;
+    }
+};
+
+class Checkbox : public Element {
+public:
+    int enabled;              // 0xD4 (based on CE view)
+    char pad2[ 0x28 ];          // padding until next pointer/field
+}; // ends around 0xF0
+
+class Dropdown : public Element {
+public:
+    int open;               // 0xD4: Dropdown open/closed state
+    char pad1[ 0x28 ];
+    int selected_index;     // 0x100: Selected index value ← YOUR NEW FINDING
+}; // ends around 0xF0
+
+class MultiDropdown : public Element {
+public:
+    // 0xD4: open flag (1 byte)
+    uint8_t m_open;              // 0xD4
+    uint8_t pad_after_open[0xF0 - 0xD5];
+
+    // 0xF0: m_items vector<GameString> (RawVector<GameString>)
+    RawVector<GameString> m_items;   // _Myfirst/_Mylast/_Myend stored at 0xF0..0xFB
+
+    // padding until 0x10C (there are other fields here in the real class)
+    uint8_t pad_to_anim[0x10C - (0xF0 + sizeof(RawVector<GameString>))];
+
+    // 0x10C: animation height / progress (float)
+    float m_anim_height;         // 0x10C
+
+    // padding until 0x110
+    // uint8_t pad_to_active[0x110 - (0x10C + sizeof(float))];
+
+    // 0x110: m_active_items vector<size_t> (x86 size_t == uint32_t)
+    RawVector<GameString> m_active_items; // _Myfirst/_Mylast/_Myend at 0x110..0x11B
+
+    // 0x11C: some pointer used by think() (interpreted in IDA as pointer)
+    uintptr_t m_some_ptr;        // 0x11C
+
+    // 0x120: sentinel (constructor sets 0xFFFFFFFF)
+    int m_sentinel;              // 0x120
+};
 
 class Slider : public Element {
 public:
