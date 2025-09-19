@@ -1,5 +1,5 @@
 #include "includes.h"
-#include "address.h"
+#include "memory2.h"
 
 #include "MinHook.h"
 #include <intrin.h>
@@ -113,6 +113,13 @@ static DWORD WINAPI ModuleWatcherThreadProc( LPVOID lpParam ) {
 }
 
 void Hooks::init( ) {
+    m_client.init( g_csgo.m_client );
+    //m_client.add( CHLClient::LEVELINITPREENTITY, util::force_cast( &Hooks::LevelInitPreEntity ) );
+    m_client.add( CHLClient::LEVELINITPOSTENTITY, util::force_cast( &Hooks::LevelInitPostEntity ) );
+   // m_client.add( CHLClient::LEVELSHUTDOWN, util::force_cast( &Hooks::LevelShutdown ) );
+    //m_client.add( CHLClient::INKEYEVENT, util::force_cast( &Hooks::IN_KeyEvent ) );
+    //m_client.add( CHLClient::FRAMESTAGENOTIFY, util::force_cast( &Hooks::FrameStageNotify ) );
+
 	if ( MH_Initialize( ) )
 		throw std::runtime_error( "unable to init minhook" );
 
@@ -217,7 +224,7 @@ void __fastcall Hooks::MultiDropdown__Think(MultiDropdown* ecx) {
     auto [it, inserted] = g_multiDropdownInstances.insert(ecx);
 
     uintptr_t base = reinterpret_cast<uintptr_t>(ecx);
-    DumpMultiDropdownDebug(base);
+    //DumpMultiDropdownDebug(base);
     return oMultiDropdown__Think(ecx);
 }
 
@@ -237,5 +244,12 @@ void __fastcall Hooks::Slider__Think( Slider* ecx ) {
     auto [it, inserted] = g_sliderInstances.insert( ecx );
 
     return oSlider__Think( ecx );
+}
+
+void Hooks::LevelInitPostEntity( ) {
+    g_cl.OnMapload( );
+
+    // invoke original method.
+    g_hooks.m_client.GetOldMethod< LevelInitPostEntity_t >( CHLClient::LEVELINITPOSTENTITY )( this );
 }
 

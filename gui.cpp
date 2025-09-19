@@ -521,6 +521,15 @@ void Gui::Render( ) noexcept {
             ImGui::Checkbox( "sex2", &g_Vars.misc.sex2 );
             ImGui::Checkbox( "sex3", &g_Vars.misc.sex3 );
 
+            if ( g_cl.m_local ) {
+                int wpn = g_cl.m_local->GetActiveWeapon( )->m_iItemDefinitionIndex( );
+
+                if ( ImGui::Button( "yeah" ) ) {
+                    std::stringstream ss;
+                    ss << "weaponid " << wpn;
+                    Log( ) << ss.str( );
+                }
+            }
         }
         ImGui::EndChild( );
 

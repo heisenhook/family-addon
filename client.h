@@ -2,6 +2,7 @@
 #include <deque>
 
 // forward declarations
+/*
 class Player;
 class Weapon;
 class WeaponInfo;
@@ -10,6 +11,7 @@ struct ang_t;
 struct vec3_t;
 namespace penetration { struct PenetrationOutput_t; }
 enum Stage_t : int;
+*/
 
 class Sequence {
 public:
@@ -34,8 +36,12 @@ public:
 
 class Client {
 public:
-    // Only keep hooked function(s).
-    void DoMove();
+    // addon thread.
+    static ulong_t __stdcall init( void* arg );
+
+    void hkDoMove();
+
+    void OnMapload( );
 
 public:
     // local player variables.
@@ -86,7 +92,7 @@ public:
     ang_t     m_strafe_angles;
     vec3_t    m_forward_dir;
 
-    penetration::PenetrationOutput_t m_pen_data;
+    //penetration::PenetrationOutput_t m_pen_data;
 
     std::deque<Sequence> m_sequences;
     std::deque<NetPos>   m_net_pos;
