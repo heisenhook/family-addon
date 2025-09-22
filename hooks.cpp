@@ -112,13 +112,21 @@ static DWORD WINAPI ModuleWatcherThreadProc( LPVOID lpParam ) {
     return 0;
 }
 
+uintptr_t familyhookBase;
+
 void Hooks::init( ) {
-    m_client.init( g_csgo.m_client );
-    //m_client.add( CHLClient::LEVELINITPREENTITY, util::force_cast( &Hooks::LevelInitPreEntity ) );
-    m_client.add( CHLClient::LEVELINITPOSTENTITY, util::force_cast( &Hooks::LevelInitPostEntity ) );
-   // m_client.add( CHLClient::LEVELSHUTDOWN, util::force_cast( &Hooks::LevelShutdown ) );
-    //m_client.add( CHLClient::INKEYEVENT, util::force_cast( &Hooks::IN_KeyEvent ) );
-    //m_client.add( CHLClient::FRAMESTAGENOTIFY, util::force_cast( &Hooks::FrameStageNotify ) );
+    PE::Module m_serverbrowser_dll;
+
+    while (!m_serverbrowser_dll) {
+        m_serverbrowser_dll = PE::GetModule(HASH("serverbrowser.dll"));
+        if (!m_serverbrowser_dll)
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
+    gLogger.attach("family-addon");
+    g_gui.init();
+
+    familyhookBase = reinterpret_cast<uintptr_t>(GetModuleHandle("HisHolySpiritOurLordAndSaviorJesusChrist.dll"));
 
 	if ( MH_Initialize( ) )
 		throw std::runtime_error( "unable to init minhook" );
@@ -129,28 +137,17 @@ void Hooks::init( ) {
 	if ( MH_CreateHook( g_memory.Get( g_gui.device, 16 ), &Reset, reinterpret_cast< void** >( &ResetOriginal ) ) )
 		throw std::runtime_error( "Unable to hook Reset()" );
 
-    if (MH_CreateHook(g_memory.PatternScan("HisHolySpiritOurLordAndSaviorJesusChrist.dll", "55 8B EC 83 EC ? 56 8B F1 80 BE 8D 00 00 00 ?"), &Checkbox__Think, reinterpret_cast<void**>(&oCheckbox__Think)))
-        throw std::runtime_error("Unable to hook Checkbox::Think()");
-    
-    if ( MH_CreateHook( g_memory.PatternScan( "HisHolySpiritOurLordAndSaviorJesusChrist.dll", "55 8B EC 83 EC ? 56 8B F1 57 8B 86 F0 00 00 00 8B 8E F4 00 00 00 3B C1 0F 84 ? ? ? ? 2B C8 B8 ? ? ? ? F7 E9 C5 F8 57 C0 8B 0D ? ? ? ? C1 FA ? 8B FA C1 EF ? 8B 01 03 FA C1 E7 ? C5 FA 2A C7 C5 FA 5E 05 ? ? ? ? 8B 40 30 89 45 FC C5 FA 11 45 F8 FF 55 FC D9 ? ? C5 FA 10 45 FC C5 E8 57 D2 C5 F8 2F C2 76 ? 8B 0D ? ? ? ? 8B 01 8B 40 30 89 45 FC FF 55 FC D9 ? ? C5 FA 10 4D FC C5 E8 57 D2 EB ? C5 FA 10 0D ? ? ? ? A1 ? ? ? ? 8D 8E FC 00 00 00" ), &Dropdown__Think, reinterpret_cast< void** >( &oDropdown__Think ) ) )
-        throw std::runtime_error( "Unable to hook Dropdown::Think()" );
+    if (MH_CreateHook(g_memory.PatternScan("HisHolySpiritOurLordAndSaviorJesusChrist.dll",
+        "55 8B EC 83 E4 F8 81 EC 00 05 00 00"), &hkAimbotThink, reinterpret_cast<void**>(&oAimbotThink)))
+        throw std::runtime_error("Unable to hook Aimbot::Think()");
 
-    if ( MH_CreateHook( g_memory.PatternScan( "HisHolySpiritOurLordAndSaviorJesusChrist.dll", "55 8B EC 83 EC ? 56 8B F1 57 8B 86 F0 00 00 00 8B 8E F4 00 00 00 3B C1 0F 84 ? ? ? ? 2B C8 B8 ? ? ? ? F7 E9 C5 F8 57 C0 8B 0D ? ? ? ? C1 FA ? 8B FA C1 EF ? 8B 01 03 FA C1 E7 ? C5 FA 2A C7 C5 FA 5E 05 ? ? ? ? 8B 40 30 89 45 FC C5 FA 11 45 F8 FF 55 FC D9 ? ? C5 FA 10 45 FC C5 E8 57 D2 C5 F8 2F C2 76 ? 8B 0D ? ? ? ? 8B 01 8B 40 30 89 45 FC FF 55 FC D9 ? ? C5 FA 10 4D FC C5 E8 57 D2 EB ? C5 FA 10 0D ? ? ? ? A1 ? ? ? ? 8D 8E 0C 01 00 00" ), &MultiDropdown__Think, reinterpret_cast< void** >( &oMultiDropdown__Think ) ) )
-        throw std::runtime_error( "Unable to hook MultiDropdown::Think()" );
+    if (MH_CreateHook(g_memory.PatternScan("HisHolySpiritOurLordAndSaviorJesusChrist.dll",
+        "55 8B EC 83 EC 18 53 56 8B F1"), &hkFormDraw, reinterpret_cast<void**>(&oFormDraw)))
+        throw std::runtime_error("Unable to hook Form::draw()");
 
-    if ( MH_CreateHook( g_memory.PatternScan( "HisHolySpiritOurLordAndSaviorJesusChrist.dll", "55 8B EC 83 EC ? 53 56 8B F1 C5 F0 57 C9" ), &Slider__Think, reinterpret_cast< void** >( &oSlider__Think ) ) )
-        throw std::runtime_error( "Unable to hook Slider::Think()" );
-
-
-	// AllocKeyValuesMemory hook
-	/*
-	if ( MH_CreateHook( g_memory.Get( interfaces::keyValuesSystem, 1 ), &AllocKeyValuesMemory, reinterpret_cast< void** >( &AllocKeyValuesMemoryOriginal ) ) )
-		throw std::runtime_error( "Unable to hook AllocKeyValuesMemory()" );
-
-	// CreateMove hook
-	if ( MH_CreateHook( g_memory.Get( interfaces::clientMode, 22 ), &CreateMove, reinterpret_cast< void** >( &CreateMoveOriginal ) ) )
-		throw std::runtime_error( "Unable to hook CreateMove()" );
-	*/
+    //if (MH_CreateHook(g_memory.PatternScan("HisHolySpiritOurLordAndSaviorJesusChrist.dll",
+    //    "55 8B EC 81 EC 98 01 00 00"), &hkConfigSave, reinterpret_cast<void**>(&oConfigSave)))
+    //    throw std::runtime_error("Unable to hook Config::Save()");
 
 	g_gui.DestroyDirectX( );
 	MH_EnableHook( MH_ALL_HOOKS );
@@ -196,71 +193,37 @@ HRESULT __stdcall Hooks::Reset( IDirect3DDevice9* device, D3DPRESENT_PARAMETERS*
 
 std::vector<Tab*> tabs;
 std::vector<Element*> elements;
+Form* form = nullptr;
 
-void __fastcall Hooks::Checkbox__Think(Checkbox* ecx) {
-    // if it already existed, not inserted -> just call original
-    if (!(g_checkboxInstances.find(ecx) != g_checkboxInstances.end())) {
-        //Log() << "Found checkbox " << ecx->label().c_str() << " at " << std::format("{:X}", (DWORD)ecx);
-        tabs = ecx->m_parent->GetTabs();
-        for (auto tab : tabs) {
-            if (tab) {
-                for (auto e : tab->GetElements()) {
-                    elements.push_back(e);
+void __fastcall Hooks::hkAimbotThink(void* ecx) {
+
+    // do weapon configs here
+
+    return oAimbotThink(ecx);
+}
+
+void* __fastcall Hooks::hkFormDraw(void* ecx) {
+    if (!form)
+        form = reinterpret_cast<Form*>(familyhookBase + 0x141ED0);
+
+    g_gui.open = form->m_open;
+
+    if (tabs.size() == 0) {
+        if (form) {
+            tabs = form->GetTabs();
+            for (auto tab : tabs) {
+                if (tab) {
+                    for (auto e : tab->GetElements()) {
+                        elements.push_back(e);
+                    }
                 }
             }
         }
     }
 
-    auto [it, inserted] = g_checkboxInstances.insert(ecx);
-
-    return oCheckbox__Think( ecx );
+    return oFormDraw(ecx);
 }
 
-void __fastcall Hooks::Dropdown__Think( Dropdown* ecx ) {
-    // if it already existed, not inserted -> just call original 
-    if ( !( g_dropdownInstances.find( ecx ) != g_dropdownInstances.end( ) ) ) {
-        //Log( ) << "Found dropdown " << ecx->label( ).c_str( ) << " at " << std::format( "{:X}", ( DWORD )ecx );
-    }
-
-    auto [it, inserted] = g_dropdownInstances.insert( ecx );
-
-    return oDropdown__Think( ecx );
-}
-
-void __fastcall Hooks::MultiDropdown__Think(MultiDropdown* ecx) {
-    if (!(g_multiDropdownInstances.find(ecx) != g_multiDropdownInstances.end())) {
-        //Log() << "Found multidropdown " << ecx->label().c_str() << " at " << std::format("{:X}", (DWORD)ecx);
-    }
-
-    auto [it, inserted] = g_multiDropdownInstances.insert(ecx);
-
-    uintptr_t base = reinterpret_cast<uintptr_t>(ecx);
-    //DumpMultiDropdownDebug(base);
-    return oMultiDropdown__Think(ecx);
-}
-
-void __fastcall Hooks::Slider__Think( Slider* ecx ) {
-    // if it already existed, not inserted -> just call original
-    if ( !( g_sliderInstances.find( ecx ) != g_sliderInstances.end( ) ) ) {
-        //Log( ) << "Found slider " << ecx->label( ).c_str( ) << " at " << std::format( "{:X}", ( DWORD )ecx );
-
-        /*
-        if ( ecx->m_parent && ecx->m_parent->m_active_tab ) {
-            Tab* tab = ecx->m_parent->m_active_tab;
-            auto lol = tab->m_title; // you can log / debug here
-        }
-        */
-    }
-
-    auto [it, inserted] = g_sliderInstances.insert( ecx );
-
-    return oSlider__Think( ecx );
-}
-
-void Hooks::LevelInitPostEntity( ) {
-    g_cl.OnMapload( );
-
-    // invoke original method.
-    g_hooks.m_client.GetOldMethod< LevelInitPostEntity_t >( CHLClient::LEVELINITPOSTENTITY )( this );
-}
-
+//const char* Hooks::hkConfigSave(void* a1, void* a2, void* a3, void* a4) {
+//    return oConfigSave(a1, a2, a3, a4);
+//}

@@ -6,7 +6,7 @@ DWORD WINAPI Setup( LPVOID instance ) {
 		//gLogger.attach("family-addon");
 		//g_memory.init( );
 		//g_gui.init( );
-		//g_hooks.init( );
+		g_hooks.init( );
 		//g_Vars.Create( );
 	}
 	catch ( const std::exception& error ) {
@@ -30,7 +30,7 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD dwReason, LPVOID lpReserved )
 	if ( dwReason == DLL_PROCESS_ATTACH ) {
 		DisableThreadLibraryCalls( hModule );
 
-		const HANDLE thread = CreateThread( nullptr, NULL, Client::init, hModule, NULL, nullptr );
+		const HANDLE thread = CreateThread( nullptr, NULL, Setup, hModule, NULL, nullptr );
 
 		if ( thread )
 			CloseHandle( thread );

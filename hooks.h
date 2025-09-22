@@ -64,8 +64,6 @@ public:
 
 public:
 
-    void LevelInitPostEntity( );
-
     // hooks
     using EndSceneFn = long( __thiscall* )( void*, IDirect3DDevice9* ) noexcept;
     inline static EndSceneFn EndSceneOriginal = nullptr;
@@ -75,22 +73,17 @@ public:
     inline static ResetFn ResetOriginal = nullptr;
     static HRESULT __stdcall Reset( IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params ) noexcept;
 
-    using Checkbox__ThinkFn = void(__thiscall*)(Checkbox*);
-    inline static Checkbox__ThinkFn oCheckbox__Think = nullptr;
-    static void __fastcall Checkbox__Think(Checkbox* ecx);
+	using Aimbot__ThinkFn = void( __thiscall* )( void* );
+	inline static Aimbot__ThinkFn oAimbotThink = nullptr;
+	static void __fastcall hkAimbotThink(void* ecx);
 
-    using Dropdown__ThinkFn = void( __thiscall* )( Dropdown* );
-    inline static Dropdown__ThinkFn oDropdown__Think = nullptr;
-    static void __fastcall Dropdown__Think( Dropdown* ecx );
+	using Form__DrawFn = void*( __thiscall* )( void* );
+	inline static Form__DrawFn oFormDraw = nullptr;
+	static void* __fastcall hkFormDraw(void* ecx);
 
-    using MultiDropdown__ThinkFn = void( __thiscall* )( MultiDropdown* );
-    inline static MultiDropdown__ThinkFn oMultiDropdown__Think = nullptr;
-    static void __fastcall MultiDropdown__Think( MultiDropdown* ecx );
-
-    using Slider__ThinkFn = void( __thiscall* )( Slider * );
-    inline static Slider__ThinkFn oSlider__Think = nullptr;
-    static void __fastcall Slider__Think( Slider* ecx );
-
+	//using Config__SaveFn = const char*( __stdcall* )( void*, void*, void*, void*);
+	//inline static Config__SaveFn oConfigSave = nullptr;
+	//static const char* hkConfigSave(void* a1, void* a2, void* a3, void* a4);
 
     HANDLE watcherHandle = nullptr;
 
@@ -138,7 +131,3 @@ public:
 };
 
 extern Hooks g_hooks;
-extern std::unordered_set<Checkbox*> g_checkboxInstances;
-extern std::unordered_set<Dropdown*> g_dropdownInstances;
-extern std::unordered_set<MultiDropdown*> g_multiDropdownInstances;
-extern std::unordered_set<Slider*> g_sliderInstances;

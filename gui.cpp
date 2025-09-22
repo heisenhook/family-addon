@@ -658,10 +658,6 @@ void Gui::Render( ) noexcept {
 }
 
 LRESULT CALLBACK WindowProcess( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) {
-	// toggle menu
-	if ( GetAsyncKeyState( VK_INSERT ) & 1 )
-		g_gui.open = !g_gui.open;
-
 	// pass msg to imgui
 	if ( g_gui.open && ImGui_ImplWin32_WndProcHandler( hWnd, msg, wParam, lParam ) )
 		return 1L; // return & do not call original window process

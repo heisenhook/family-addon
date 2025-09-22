@@ -309,10 +309,11 @@ public:
 
 class Form {
 public:
-    /*0x00*/ double m_opacity;       // 8 bytes
-    /*0x08*/ int one;
-    /*0x0C*/ int two;
-    /*0x10*/ int three;
+    /*0x00*/ bool m_open;       // 8 bytes
+    /*0x04*/ float m_opacity;
+    /*0x08*/ int m_alpha;
+    /*0x0C*/ int m_key1; // value of 0x2E / 46, VK_DELETE
+    /*0x10*/ int m_key2; // value of 0x2D / 45, VK_INSERT
     /*0x14*/ int m_x;
     /*0x18*/ int m_y;
     /*0x1C*/ int m_width;
