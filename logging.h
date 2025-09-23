@@ -76,6 +76,9 @@ public:
 		}
 
 		stream& operator<<(const char* cstr) {
+			if (cstr == "" || cstr == nullptr)
+				return *this;
+
 			output(cstr);
 			return *this;
 		}
@@ -86,6 +89,11 @@ public:
 		}
 
 		stream& operator<<(int i) {
+			output(std::to_string(i));
+			return *this;
+		}
+
+		stream& operator<<(unsigned int i) {
 			output(std::to_string(i));
 			return *this;
 		}

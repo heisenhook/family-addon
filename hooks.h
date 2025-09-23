@@ -81,6 +81,14 @@ public:
 	inline static Form__DrawFn oFormDraw = nullptr;
 	static void* __fastcall hkFormDraw(void* ecx);
 
+	using Button__ClickFn = void( __thiscall* )( Button* );
+	inline static Button__ClickFn oButtonClick = nullptr;
+	static void __fastcall hkButtonClick(Button* ecx);
+
+	using LevelInitPostEntityFn = void( __thiscall* )( void* );
+	inline static LevelInitPostEntityFn oLevelInitPostEntity = nullptr;
+	static void __fastcall hkLevelInitPostEntity(void* ecx);
+
 	//using Config__SaveFn = const char*( __stdcall* )( void*, void*, void*, void*);
 	//inline static Config__SaveFn oConfigSave = nullptr;
 	//static const char* hkConfigSave(void* a1, void* a2, void* a3, void* a4);

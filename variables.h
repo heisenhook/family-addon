@@ -506,6 +506,7 @@ public:
 
 	config_option( float, keybind_pos_x, 50 );
 	config_option( float, keybind_pos_y, 50 );
+
 	group_end( );
 
 #pragma region Skin Changer
@@ -577,6 +578,8 @@ public:
 
 	config_option( int, accuracy, 0 ); // Fake angles, Lag compensation, Override aimbot, Override accuracy
 
+	config_option( bool, weapon_configs, false);
+
 	// debug stuff here.
 #if defined(DEV) || defined(BETA_MODE) || defined(DEBUG_MODE)
 	config_option( bool, visualize_safepoints, false );
@@ -598,7 +601,7 @@ public:
 	group_begin( RAGE );
 	
 	config_option( bool, override_default_config, false );
-	config_option( bool, automatic_fire, false );
+	config_option( bool, aimbot_enable, false );
 
 
 	config_option( bool, hitbox_head, true );

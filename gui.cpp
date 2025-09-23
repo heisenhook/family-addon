@@ -335,11 +335,48 @@ void Gui::Render( ) noexcept {
 	ImGui::EndChild( );
 
     if ( selected_tab == 0 ) {
+        static int weapon_config_selection = 0;
         CVariables::RAGE* rage = &g_Vars.rage_default; // todo: add in weapon check functionality
+
+        switch ( weapon_config_selection ) { 
+        case 0:
+            rage = &g_Vars.rage_default;
+            break;
+        case 1:
+            rage = &g_Vars.rage_pistols;
+            break;
+        case 2:
+            rage = &g_Vars.rage_revolver;
+            break;
+        case 3:
+            rage = &g_Vars.rage_deagle;
+            break;
+        case 4:
+            rage = &g_Vars.rage_awp;
+            break;
+        case 5:
+            rage = &g_Vars.rage_scout;
+            break;
+        case 6:
+            rage = &g_Vars.rage_autosnipers;
+            break;
+        }
+
+        g_Vars.current_rage_option = rage;
 
         ImGui::SetNextWindowPos( calculateChildWindowPosition( 0, 1 ) );
         ImGui::BeginChild( "Aimbot", childSize( 0, 1, 1.f ), true );
         {
+
+            std::vector<std::string> weapon_config {
+                "Default",
+                "Pistols",
+                "Revolver",
+                "Deagle",
+                "AWP",
+                "Scout",
+                "Autosniper",
+            };
 
             std::vector<MultiItem_t> hitboxes {
                 { "Head", &rage->hitbox_head },
@@ -367,10 +404,9 @@ void Gui::Render( ) noexcept {
                 "Very high"
             };
 
+            ImGui::Checkbox("Enable weapon configs", &g_Vars.rage.weapon_configs);
+            ImGui_Dropdown("Weapon config", weapon_config, &weapon_config_selection);
             ImGui::Checkbox( "Override default config", &rage->override_default_config);
-            //ImGui::MultiSelect( "Hitboxes", )
-
-            
 
             ImGui_MultiSelect( "Hitboxes", hitboxes );
             ImGui_MultiSelect( "Multipoints", multipoints );

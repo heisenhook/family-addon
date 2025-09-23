@@ -3,6 +3,100 @@
 #include <sstream>
 #include <iomanip>
 
+enum ItemDefinitionIndex {
+    ITEM_NONE = 0,
+    WEAPON_DEAGLE,
+    WEAPON_ELITE,
+    WEAPON_FIVESEVEN,
+    WEAPON_GLOCK,
+    WEAPON_AK47 = 7,
+    WEAPON_AUG,
+    WEAPON_AWP,
+    WEAPON_FAMAS,
+    WEAPON_G3SG1,
+    WEAPON_GALIL = 13,
+    WEAPON_M249,
+    WEAPON_M4A4 = 16,
+    WEAPON_MAC10,
+    WEAPON_P90 = 19,
+    WEAPON_ZONE_REPULSOR,
+    WEAPON_MP5SD = 23,
+    WEAPON_UMP45,
+    WEAPON_XM1014,
+    WEAPON_BIZON,
+    WEAPON_MAG7,
+    WEAPON_NEGEV,
+    WEAPON_SAWEDOFF,
+    WEAPON_TEC9,
+    WEAPON_ZEUS,
+    WEAPON_P2000,
+    WEAPON_MP7,
+    WEAPON_MP9,
+    WEAPON_NOVA,
+    WEAPON_P250,
+    WEAPON_SHIELD,
+    WEAPON_SCAR20,
+    WEAPON_SG553,
+    WEAPON_SSG08,
+    WEAPON_KNIFEGG,
+    WEAPON_KNIFE,
+    WEAPON_FLASHBANG,
+    WEAPON_HEGRENADE,
+    WEAPON_SMOKEGRENADE,
+    WEAPON_MOLOTOV,
+    WEAPON_DECOY,
+    WEAPON_INC,
+    WEAPON_C4,
+    WEAPON_HEALTHSHOT = 57,
+    WEAPON_KNIFE_T = 59,
+    WEAPON_M4A1S,
+    WEAPON_USPS,
+    WEAPON_CZ75 = 63,
+    WEAPON_REVOLVER,
+    WEAPON_TAGRENADE = 68,
+    WEAPON_FISTS,
+    WEAPON_BREACHCHARGE,
+    WEAPON_TABLET = 72,
+    WEAPON_MELEE = 74,
+    WEAPON_AXE,
+    WEAPON_HAMMER,
+    WEAPON_SPANNER = 78,
+    WEAPON_KNIFE_GHOST = 80,
+    WEAPON_FIREBOMB,
+    WEAPON_DIVERSION,
+    WEAPON_FRAG_GRENADE,
+    WEAPON_SNOWBALL,
+    WEAPON_BUMPMINE,
+    WEAPON_KNIFE_BAYONET = 500,
+    WEAPON_KNIFE_FLIP = 505,
+    WEAPON_KNIFE_GUT,
+    WEAPON_KNIFE_KARAMBIT,
+    WEAPON_KNIFE_M9_BAYONET,
+    WEAPON_KNIFE_TACTICAL,
+    WEAPON_KNIFE_FALCHION = 512,
+    WEAPON_KNIFE_SURVIVAL_BOWIE = 514,
+    WEAPON_KNIFE_BUTTERFLY,
+    WEAPON_KNIFE_PUSH = 516,
+    WEAPON_KNIFE_CORD = 517,
+    WEAPON_KNIFE_CANIS = 518,
+    WEAPON_KNIFE_URSUS = 519,
+    WEAPON_KNIFE_GYPSY_JACKKNIFE = 520,
+    WEAPON_KNIFE_OUTDOOR = 521,
+    WEAPON_KNIFE_STILETTO = 522,
+    WEAPON_KNIFE_WIDOWMAKER = 523,
+    WEAPON_KNIFE_SKELETON = 525,
+    GLOVE_STUDDED_BLOODHOUND = 5027,
+    GLOVE_T_SIDE = 5028,
+    GLOVE_CT_SIDE = 5029,
+    GLOVE_SPORTY = 5030,
+    GLOVE_SLICK = 5031,
+    GLOVE_LEATHER_WRAP = 5032,
+    GLOVE_MOTORCYCLE = 5033,
+    GLOVE_SPECIALIST = 5034,
+    GLOVE_HYDRA = 5035,
+    MAX_ITEM_DEFINITION_INDEX,
+};
+
 // helper small vector view for x86 pointer-sized entries
 struct VectorView {
     uintptr_t* first; // pointer to first element
@@ -10,6 +104,21 @@ struct VectorView {
     uintptr_t* end;   // pointer end (capacity)
     size_t count( ) const { return ( last - first ); } // number of entries
 };
+
+
+// Read a RawVector<T> stored at base + offset (2 pointers for x86: first,last)
+// returns true and fills out_first/out_last if successful.
+static inline bool read_raw_vector_ptrs(uintptr_t base, uint32_t offset, uintptr_t& out_first, uintptr_t& out_last) {
+    __try {
+        out_first = *reinterpret_cast<uint32_t*>(base + offset);
+        out_last = *reinterpret_cast<uint32_t*>(base + offset + 4);
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) {
+        out_first = out_last = 0;
+        return false;
+    }
+}
 
 template<typename T>
 struct RawVector {
@@ -30,6 +139,37 @@ struct RawVector {
 
     bool valid() const {
         return first != nullptr && last != nullptr && last >= first;
+    }
+
+    //bool read() {
+    //    return read_raw_vector_ptrs((uintptr_t)this, 0, (uintptr_t&)first, (uintptr_t&)last);
+    //}
+
+    std::vector<T> get() {
+        uintptr_t first = 0, last = 0;
+
+        if (!valid())
+            return {};
+
+        first = (uintptr_t)this->first;
+        last = (uintptr_t)this->last;
+
+        if (!first || !last || last <= first)
+            return {};
+
+        size_t count = (last - first) / sizeof(void*); // x86: 4-byte pointers
+        std::vector<T> out;
+        out.reserve(count);
+
+        for (size_t i = 0; i < count; ++i) {
+            uintptr_t address = first + i * sizeof(void*);
+            out.push_back(*reinterpret_cast<T*>(address));
+        }
+
+#ifdef _DEBUG
+        Log() << "Found vector with " << count << " values at " << std::format("{:X}", (DWORD)first);
+#endif
+        return out;
     }
 };
 
@@ -59,7 +199,7 @@ struct GameString
     const char* c_str( ) const
     {
         // If length fits in the inline buffer, use SSO
-        if ( length <= 15 )
+        if ( length <= 15 && length > 0 )
             return ssoData;
 
         // Otherwise use the heap pointer
@@ -82,20 +222,6 @@ static inline std::string ReadStdStringAtAddr(uintptr_t addr) {
     if (gs->length < 0 || gs->length > 0x10000) return {};
     // if SSO or heap pointer missing this still works (c_str handles it)
     return gs->to_std();
-}
-
-// Read a RawVector<T> stored at base + offset (2 pointers for x86: first,last)
-// returns true and fills out_first/out_last if successful.
-static inline bool read_raw_vector_ptrs(uintptr_t base, uint32_t offset, uintptr_t& out_first, uintptr_t& out_last) {
-    __try {
-        out_first = *reinterpret_cast<uint32_t*>(base + offset);
-        out_last = *reinterpret_cast<uint32_t*>(base + offset + 4);
-        return true;
-    }
-    __except (EXCEPTION_EXECUTE_HANDLER) {
-        out_first = out_last = 0;
-        return false;
-    }
 }
 
 // Read active indices from m_active_items (offset 0x110). Returns vector of indices.
@@ -283,7 +409,7 @@ public:
     /*0x1C*/ RawVector<Element*> m_elements; // 0x0C
 
 public:
-    std::vector<Element*> GetElements() {
+    /*std::vector<Element*> GetElements() {
         uintptr_t first = 0, last = 0;
         if (!read_raw_vector_ptrs((uintptr_t)this, 0x1C, first, last))
             return {};
@@ -298,13 +424,14 @@ public:
         for (size_t i = 0; i < count; ++i) {
             uintptr_t element_address = first + i * sizeof(void*);
             out.push_back(*reinterpret_cast<Element**>(element_address));
-            Element* e = *reinterpret_cast<Element**>(element_address);
+#ifdef _DEBUG
             if (reinterpret_cast<Element*>(element_address))
                 Log() << "Found element " << (*reinterpret_cast<Element**>(element_address))->m_file_id.c_str() << " at " << std::format("{:X}", (DWORD)element_address);
+#endif
         }
 
         return out;
-    }
+    }*/
 };
 
 class Form {
@@ -325,10 +452,16 @@ public:
     /*0x54*/ Tab* m_active_tab;
     /*0x58*/ Element* m_active_element;
 public:
-    std::vector<Tab*> GetTabs() {
+    /*std::vector<Tab*> GetTabs() {
         uintptr_t first = 0, last = 0;
-        if (!read_raw_vector_ptrs((uintptr_t)this, 0x28, first, last))
+        //if (!read_raw_vector_ptrs((uintptr_t)this, 0x28, first, last))
+        //    return {};
+
+        if (!m_tabs.read())
             return {};
+
+        first = (uintptr_t)m_tabs.first;
+        last = (uintptr_t)m_tabs.last;
 
         if (!first || !last || last <= first)
             return {};
@@ -340,12 +473,14 @@ public:
         for (size_t i = 0; i < count; ++i) {
             uintptr_t tab_address = first + i * sizeof(void*);
             out.push_back(*reinterpret_cast<Tab**>(tab_address));
+#ifdef _DEBUG
             if (reinterpret_cast<Tab*>(tab_address))
                 Log() << "Found tab " << reinterpret_cast<Tab*>(tab_address)->m_title.c_str() << " at " << std::format("{:X}", (DWORD)tab_address);
+#endif
         }
 
         return out;
-    }
+    }*/
 };
 
 class Checkbox : public Element {
@@ -394,6 +529,8 @@ public:
     bool drag;              // 0xD4 (based on CE view)
     float value;     // 0x100: Selected index value ← YOUR NEW FINDING
 }; // ends 
+
+class Button : public Element { };
 
 static_assert(sizeof(GameString) <= 32, "Expect GameString small (SSO) on x86 builds");
 static_assert(sizeof(GameString) == 24, "Expect GameString == 24 on x86");
