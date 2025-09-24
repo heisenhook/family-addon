@@ -11,10 +11,6 @@
 #include "imgui_impl_dx9.h"
 
 Hooks g_hooks{ };
-std::unordered_set<Checkbox*> g_checkboxInstances;
-std::unordered_set<Dropdown*> g_dropdownInstances;
-std::unordered_set<MultiDropdown*> g_multiDropdownInstances;
-std::unordered_set<Slider*> g_sliderInstances;
 uintptr_t familyhookBase;
 
 void Hooks::init( ) {
