@@ -348,8 +348,24 @@ public:
 	int force_delay_on_peek;
 };*/
 
+enum class ElementType {
+	Checkbox,
+	Dropdown,
+	Slider,
+	MultiDropdown
+};
+
+struct RageConfigBinding {
+	const char* id;     // string to search for
+	ElementType type;   // what kind of menu element
+	void* target;       // pointer to variable in g_Vars
+};
+
 void GetDefaultRageConfig() {
+
 	for (auto e : AimbotElements) {
+
+
 		if (strstr(e->m_file_id.c_str(), "aimbot_enable")) {
 			g_Vars.rage_default.aimbot_enable = reinterpret_cast<Checkbox*>(e)->enabled;
 			continue;
@@ -557,21 +573,51 @@ void GetDefaultRageConfig() {
 }
 
 static void __fastcall DoWeaponConfigs(CVariables::RAGE* rage) {
-	//if (rage == lastWeaponConfig)
-	//	return;
+	if (rage == lastWeaponConfig)
+		return;
+
+	RageConfigBinding rage_bindings[ ] = {
+		{ "aimbot_enable",   ElementType::Checkbox,      &rage->aimbot_enable },
+		{ "strength_val4",   ElementType::Dropdown,      &rage->multipoint_intensity },
+		{ "scale_body",      ElementType::Slider,        &rage->pointscale },
+		{ "scale_head_height", ElementType::Slider,      &rage->pointscale_head },
+		// add more here...
+	};
 
 	// really really bad, pls fix asap
 	for (auto e : AimbotElements) {
-		if (strstr(e->m_file_id.c_str(), "aimbot_enable")) {
-			reinterpret_cast<Checkbox*>(e)->enabled = rage->aimbot_enable;
+
+		if (strstr(e->m_file_id.c_str(), "hitbox"))
+		{
+			std::vector<size_t> active;
+
+			if ( rage->hitbox_head )   active.push_back( 0 );
+			if ( rage->hitbox_chest )  active.push_back( 1 );
+			if ( rage->hitbox_body )   active.push_back( 2 );
+			if ( rage->hitbox_arms )   active.push_back( 3 );
+			if ( rage->hitbox_thighs ) active.push_back( 4 );
+			if ( rage->hitbox_calfs )  active.push_back( 5 );
+			if ( rage->hitbox_feet )   active.push_back( 6 );
+
+			reinterpret_cast< MultiDropdown* >( e )->set( active );
 			continue;
 		}
 
-		//if (strstr(e->m_file_id.c_str(), "hitbox"))
-		//{	
-		//	reinterpret_cast<MultiDropdown*>(e)->enabled = rage->aimbot_enable;
-		//	continue;
-		//}
+		if ( strstr( e->m_file_id.c_str( ), "multipoint" ) )
+		{
+			std::vector<size_t> active;
+
+			if ( rage->multipoint_head )   active.push_back( 0 );
+			if ( rage->multipoint_chest )  active.push_back( 1 );
+			if ( rage->multipoint_body )   active.push_back( 2 );
+			if ( rage->multipoint_arms )   active.push_back( 3 );
+			if ( rage->multipoint_thighs ) active.push_back( 4 );
+			if ( rage->multipoint_calfs )  active.push_back( 5 );
+			if ( rage->multipoint_feet )   active.push_back( 6 );
+
+			reinterpret_cast< MultiDropdown* >( e )->set( active );
+			continue;
+		}
 
 		if (strstr(e->m_file_id.c_str(), "strength_val4"))
 		{
@@ -648,12 +694,23 @@ static void __fastcall DoWeaponConfigs(CVariables::RAGE* rage) {
 			reinterpret_cast<Slider*>(e)->value = rage->minimal_assessed_damage;
 			continue;
 		}
+		
+		if ( strstr( e->m_file_id.c_str( ), "aimbot_autostop" ) )
+		{
+			std::vector<size_t> active;
 
-		//if (strstr(e->m_file_id.c_str(), "aimbot_autostop"))
-		//{
-		//	reinterpret_cast<MultiDropdown*>(e)->enabled = g_Vars.rage_default.aimbot_enable;
-		//	continue; 
-		//}
+			if ( rage->autostop_early )   active.push_back( 0 );
+			if ( rage->autostop_stop )  active.push_back( 1 );
+			if ( rage->autostop_jumpscout )   active.push_back( 2 );
+			if ( rage->autostop_autoscope )   active.push_back( 3 );
+			if ( rage->autostop_delay_fakelag ) active.push_back( 4 );
+			if ( rage->autostop_delay_spread )  active.push_back( 5 );
+			if ( rage->autostop_delay_taser )   active.push_back( 6 );
+
+			reinterpret_cast< MultiDropdown* >( e )->set( active );
+			continue;
+		}
+		
 
 		if (strstr(e->m_file_id.c_str(), "head_baim"))
 		{
@@ -749,12 +806,23 @@ static void __fastcall DoWeaponConfigs(CVariables::RAGE* rage) {
 			reinterpret_cast<Checkbox*>(e)->enabled = rage->reduce_hitchance_damage_override;
 			continue;
 		}
+		
+		/*
+		if (strstr(e->m_file_id.c_str(), "simplestop_flags3"))
+		{
+			std::vector<size_t> active;
 
-		//if (strstr(e->m_file_id.c_str(), "simplestop_flags3"))
-		//{
-		//	reinterpret_cast<MultiDropdown*>(e)->enabled = g_Vars.rage_default.aimbot_enable;
-		//	continue; 
-		//}
+			if ( rage->autostopflags_fallback )   active.push_back( 0 );
+			if ( rage->autostopflags_lock )  active.push_back( 1 );
+			if ( rage->autostopflags_lag )   active.push_back( 2 );
+			if ( rage->autostopflags_normal )   active.push_back( 3 );
+			if ( rage->autostopflags_aggr ) active.push_back( 4 );
+
+			reinterpret_cast< MultiDropdown* >( e )->set( active );
+			continue;
+		
+		*/
+
 		if (strstr(e->m_file_id.c_str(), "body_delay_new2"))
 		{
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->passive_delay_on_peek;

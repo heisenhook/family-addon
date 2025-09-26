@@ -679,10 +679,10 @@ public:
 	config_option( bool, reduce_hitchance_damage_override ); // Allow hitchance reduction while overriding damage
 
 	config_option( bool, autostopflags_fallback, false );
-	config_option( bool, autostopflags_avoid_locking_movement, true );
-	config_option( bool, autostopflags_early_lag_delayed, false );
-	config_option( bool, autostopflags_early_normal_peek, true );
-	config_option( bool, autostopflags_early_aggresive_peek, true );
+	config_option( bool, autostopflags_lock, true );
+	config_option( bool, autostopflags_lag, false );
+	config_option( bool, autostopflags_normal, true );
+	config_option( bool, autostopflags_aggr, true );
 
 	config_option( int, passive_delay_on_peek, 1 ); // Off, When safe, Always
 	config_option( int, force_delay_on_peek, 0 ); // Off, When safe, Always

@@ -461,7 +461,7 @@ void Gui::Render( ) noexcept {
             if ( g_Vars.rage.accuracy == 1 ) {
                 ImGui_Dropdown( "Avoid body edges", { "Off", "Low", "Medium", "High", }, &rage->avoid_body_edges );
                 SliderInt( "Prefer fake body overlap", &rage->prefer_fakebody_overlap, 0, 100 );
-                ImGui_Dropdown( "Head accuracy mode", { "Below normal", "Normal", "Strict", }, &rage->avoid_body_edges );
+                ImGui_Dropdown( "Head accuracy mode", { "Below normal", "Normal", "Strict", }, &rage->head_accuracy_mode );
                 SliderInt( "Prefer fake head overlap", &rage->prefer_fakehead_overlap, 0, 100 );
             }
 
@@ -488,10 +488,10 @@ void Gui::Render( ) noexcept {
 
                 std::vector<MultiItem_t> autostopflags{
                     {"Fallback", &rage->autostopflags_fallback },
-                    {"Avoid locking movement", &rage->autostopflags_avoid_locking_movement },
-                    {"Early on lag-delayed", &rage->autostopflags_early_lag_delayed },
-                    {"Early on normal-peek", &rage->autostopflags_early_normal_peek },
-                    {"Early on aggressive-peek", &rage->autostopflags_early_aggresive_peek },
+                    {"Avoid locking movement", &rage->autostopflags_lock },
+                    {"Early on lag-delayed", &rage->autostopflags_lag },
+                    {"Early on normal-peek", &rage->autostopflags_normal },
+                    {"Early on aggressive-peek", &rage->autostopflags_aggr },
                 };
 
                 ImGui_MultiSelect( "Automatic stop flags", autostopflags );

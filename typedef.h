@@ -496,6 +496,19 @@ public:
     int selected_index;     // 0x100: Selected index value ← YOUR NEW FINDING
 }; // ends around 0xF0
 
+template<typename T>
+inline void raw_push_back( RawVector<T>& vec, const T& value ) {
+    if ( vec.last < vec.capacity ) {
+        *vec.last = value;   // write value into the "slot"
+        ++vec.last;          // advance end pointer
+    }
+    else {
+        // No room left -> can't grow because RawVector doesn't manage memory
+        // You may want to log or assert here
+        throw std::runtime_error( "raw_push_back: no capacity left" );
+    }
+}
+
 class MultiDropdown : public Element {
 public:
     // 0xD4: open flag (1 byte)
@@ -515,13 +528,46 @@ public:
     // uint8_t pad_to_active[0x110 - (0x10C + sizeof(float))];
 
     // 0x110: m_active_items vector<size_t> (x86 size_t == uint32_t)
-    RawVector<GameString> m_active_items; // _Myfirst/_Mylast/_Myend at 0x110..0x11B
+    RawVector<size_t> m_active_items; // _Myfirst/_Mylast/_Myend at 0x110..0x11B
 
     // 0x11C: some pointer used by think() (interpreted in IDA as pointer)
     uintptr_t m_some_ptr;        // 0x11C
 
     // 0x120: sentinel (constructor sets 0xFFFFFFFF)
     int m_sentinel;              // 0x120
+
+    // Get currently active items as a vector of strings
+    std::vector<std::string> get( ) {
+        std::vector<std::string> result;
+
+        for ( size_t i = 0; i < m_active_items.size( ); ++i ) {
+            uint32_t idx = m_active_items[ i ];
+            if ( idx < m_items.size( ) ) {
+                result.push_back( m_items[ idx ].to_std( ) );
+            }
+        }
+        return result;
+    }
+
+    // Replace active items with values matching given strings
+    void set( const std::vector<size_t>& values ) {
+        m_active_items.last = m_active_items.first;
+
+        for ( size_t i = 0; i < values.size( ); i++ ) {
+            raw_push_back( m_active_items, values[ i ] );
+        }
+
+        /*
+        for ( size_t i = 0; i < m_items.size( ); ++i ) {
+            auto itemStr = m_items[ i ].to_std( );
+            for ( auto& v : values ) {
+                if ( itemStr == v ) {
+                    m_active_items.push_back( i ); // store index of item
+                }
+            }
+        }
+        */
+    }
 };
 
 class Slider : public Element {
