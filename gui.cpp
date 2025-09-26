@@ -472,7 +472,7 @@ void Gui::Render( ) noexcept {
                 ImGui::Checkbox( "Override hitchance", &rage->minimum_damage_override_hitchance );
                 if ( rage->minimum_damage_override_hitchance ) {
                     SliderInt( "Hitchance primary override", &rage->minimum_hitchance_override_primary, 0, 100 );
-                    SliderInt( "Hitchance secondary override", &rage->minimum_damage_override_secondary, 0, 100 );
+                    SliderInt( "Hitchance secondary override", &rage->minimum_hitchance_override_secondary, 0, 100 );
                 } 
             }
 
