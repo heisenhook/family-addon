@@ -506,6 +506,7 @@ public:
 
 	config_option( float, keybind_pos_x, 50 );
 	config_option( float, keybind_pos_y, 50 );
+
 	group_end( );
 
 #pragma region Skin Changer
@@ -575,7 +576,12 @@ public:
 #pragma region RAGE_GENERAL group
 	group_begin( RAGE_GENERAL );
 
+	config_option( bool, aimbot_enable, false );
+	config_option( bool, automatic_fire, false );
+
 	config_option( int, accuracy, 0 ); // Fake angles, Lag compensation, Override aimbot, Override accuracy
+
+	config_option( bool, weapon_configs, false);
 
 	// debug stuff here.
 #if defined(DEV) || defined(BETA_MODE) || defined(DEBUG_MODE)
@@ -598,7 +604,7 @@ public:
 	group_begin( RAGE );
 	
 	config_option( bool, override_default_config, false );
-	config_option( bool, automatic_fire, false );
+	config_option( bool, aimbot_enable, false );
 
 
 	config_option( bool, hitbox_head, true );
@@ -676,10 +682,10 @@ public:
 	config_option( bool, reduce_hitchance_damage_override ); // Allow hitchance reduction while overriding damage
 
 	config_option( bool, autostopflags_fallback, false );
-	config_option( bool, autostopflags_avoid_locking_movement, true );
-	config_option( bool, autostopflags_early_lag_delayed, false );
-	config_option( bool, autostopflags_early_normal_peek, true );
-	config_option( bool, autostopflags_early_aggresive_peek, true );
+	config_option( bool, autostopflags_lock, true );
+	config_option( bool, autostopflags_lag, false );
+	config_option( bool, autostopflags_normal, true );
+	config_option( bool, autostopflags_aggr, true );
 
 	config_option( int, passive_delay_on_peek, 1 ); // Off, When safe, Always
 	config_option( int, force_delay_on_peek, 0 ); // Off, When safe, Always

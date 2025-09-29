@@ -86,15 +86,21 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeTypeInfo>
+      </RuntimeTypeInfo>
+      <CompileAs>Default</CompileAs>
+      <LanguageStandard_C>Default</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -149,11 +155,47 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="address.h" />
-    <ClInclude Include="base64.h" />
-    <ClInclude Include="buffer.h" />
+    <ClInclude Include="button.h" />
+    <ClInclude Include="callbacks.h" />
+    <ClInclude Include="checkbox.h" />
     <ClInclude Include="color.h" />
+    <ClInclude Include="colorpicker.h" />
+    <ClInclude Include="config_supremacy.h" />
+    <ClInclude Include="csgo.h" />
+    <ClInclude Include="cvar.h" />
+    <ClInclude Include="datamap.h" />
+    <ClInclude Include="dropdown.h" />
+    <ClInclude Include="edit.h" />
+    <ClInclude Include="element.h" />
+    <ClInclude Include="entoffsets.h" />
+    <ClInclude Include="form.h" />
+    <ClInclude Include="glow.h" />
+    <ClInclude Include="hash.h" />
+    <ClInclude Include="hud.h" />
+    <ClInclude Include="input.h" />
+    <ClInclude Include="interfaces.h" />
+    <ClInclude Include="keybind.h" />
+    <ClInclude Include="localize.h" />
+    <ClInclude Include="matchframework.h" />
+    <ClInclude Include="memory2.h" />
+    <ClInclude Include="angle.h" />
+    <ClInclude Include="base64.h" />
+    <ClInclude Include="basehandle.h" />
+    <ClInclude Include="beams.h" />
+    <ClInclude Include="buffer.h" />
+    <ClInclude Include="client.h" />
+    <ClInclude Include="clientclass.h" />
+    <ClInclude Include="clientdll.h" />
+    <ClInclude Include="clientmode.h" />
     <ClInclude Include="config.h" />
+    <ClInclude Include="engineclient.h" />
+    <ClInclude Include="entity.h" />
+    <ClInclude Include="entlist.h" />
     <ClInclude Include="FnvHash.h" />
+    <ClInclude Include="game.h" />
+    <ClInclude Include="gameevents.h" />
+    <ClInclude Include="gamerules.h" />
+    <ClInclude Include="globalvars.h" />
     <ClInclude Include="gui.h" />
     <ClInclude Include="hde32.h" />
     <ClInclude Include="hde64.h" />
@@ -168,18 +210,54 @@
     <ClInclude Include="imstb_truetype.h" />
     <ClInclude Include="includes.h" />
     <ClInclude Include="json.h" />
+    <ClInclude Include="logging.h" />
+    <ClInclude Include="math.h" />
+    <ClInclude Include="matrix.h" />
+    <ClInclude Include="memalloc.h" />
     <ClInclude Include="memory.h" />
+    <ClInclude Include="menu.h" />
     <ClInclude Include="MinHook.h" />
+    <ClInclude Include="modules.h" />
+    <ClInclude Include="multidropdown.h" />
+    <ClInclude Include="netvars.h" />
+    <ClInclude Include="networkstringtable.h" />
+    <ClInclude Include="nt.h" />
+    <ClInclude Include="pattern.h" />
+    <ClInclude Include="pe.h" />
+    <ClInclude Include="prediction.h" />
     <ClInclude Include="pstdint.h" />
+    <ClInclude Include="sdk.h" />
+    <ClInclude Include="gui_supremacy.h" />
+    <ClInclude Include="slider.h" />
+    <ClInclude Include="sound.h" />
+    <ClInclude Include="stack.h" />
+    <ClInclude Include="studio.h" />
+    <ClInclude Include="studiorender.h" />
+    <ClInclude Include="surface.h" />
+    <ClInclude Include="syscall.h" />
+    <ClInclude Include="tab.h" />
     <ClInclude Include="table32.h" />
     <ClInclude Include="table64.h" />
+    <ClInclude Include="tinyformat.h" />
+    <ClInclude Include="trace.h" />
     <ClInclude Include="trampoline.h" />
+    <ClInclude Include="typedef.h" />
+    <ClInclude Include="unique_vector.h" />
+    <ClInclude Include="util.h" />
+    <ClInclude Include="utlvector.h" />
     <ClInclude Include="variables.h" />
+    <ClInclude Include="vector2.h" />
+    <ClInclude Include="vector3.h" />
+    <ClInclude Include="vmt.h" />
+    <ClInclude Include="winapir.h" />
+    <ClInclude Include="x86.h" />
     <ClInclude Include="xorstr.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="address.cpp" />
+    <ClCompile Include="csgo.cpp" />
+    <ClCompile Include="memory2.cpp" />
     <ClCompile Include="buffer.c" />
+    <ClCompile Include="client.cpp" />
     <ClCompile Include="config.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="gui.cpp" />
@@ -194,6 +272,7 @@
     <ClCompile Include="imgui_impl_win32.cpp" />
     <ClCompile Include="imgui_tables.cpp" />
     <ClCompile Include="imgui_widgets.cpp" />
+    <ClCompile Include="math.cpp" />
     <ClCompile Include="memory.cpp" />
     <ClCompile Include="trampoline.c" />
     <ClCompile Include="variables.cpp" />

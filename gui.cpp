@@ -335,11 +335,48 @@ void Gui::Render( ) noexcept {
 	ImGui::EndChild( );
 
     if ( selected_tab == 0 ) {
+        static int weapon_config_selection = 0;
         CVariables::RAGE* rage = &g_Vars.rage_default; // todo: add in weapon check functionality
+
+        switch ( weapon_config_selection ) { 
+        case 0:
+            rage = &g_Vars.rage_default;
+            break;
+        case 1:
+            rage = &g_Vars.rage_pistols;
+            break;
+        case 2:
+            rage = &g_Vars.rage_revolver;
+            break;
+        case 3:
+            rage = &g_Vars.rage_deagle;
+            break;
+        case 4:
+            rage = &g_Vars.rage_awp;
+            break;
+        case 5:
+            rage = &g_Vars.rage_scout;
+            break;
+        case 6:
+            rage = &g_Vars.rage_autosnipers;
+            break;
+        }
+
+        g_Vars.current_rage_option = rage;
 
         ImGui::SetNextWindowPos( calculateChildWindowPosition( 0, 1 ) );
         ImGui::BeginChild( "Aimbot", childSize( 0, 1, 1.f ), true );
         {
+
+            std::vector<std::string> weapon_config {
+                "Default",
+                "Pistols",
+                "Revolver",
+                "Deagle",
+                "AWP",
+                "Scout",
+                "Autosniper",
+            };
 
             std::vector<MultiItem_t> hitboxes {
                 { "Head", &rage->hitbox_head },
@@ -367,10 +404,12 @@ void Gui::Render( ) noexcept {
                 "Very high"
             };
 
-            ImGui::Checkbox( "Override default config", &rage->override_default_config);
-            //ImGui::MultiSelect( "Hitboxes", )
+            ImGui::Checkbox("Enable", &g_Vars.rage.aimbot_enable);
+            ImGui::Checkbox("Auto-fire", &g_Vars.rage.automatic_fire);
 
-            
+            ImGui_Dropdown("Weapon config", weapon_config, &weapon_config_selection);
+            if (weapon_config_selection != 0 ) 
+                ImGui::Checkbox( "Override default config", &rage->override_default_config);
 
             ImGui_MultiSelect( "Hitboxes", hitboxes );
             ImGui_MultiSelect( "Multipoints", multipoints );
@@ -425,7 +464,7 @@ void Gui::Render( ) noexcept {
             if ( g_Vars.rage.accuracy == 1 ) {
                 ImGui_Dropdown( "Avoid body edges", { "Off", "Low", "Medium", "High", }, &rage->avoid_body_edges );
                 SliderInt( "Prefer fake body overlap", &rage->prefer_fakebody_overlap, 0, 100 );
-                ImGui_Dropdown( "Head accuracy mode", { "Below normal", "Normal", "Strict", }, &rage->avoid_body_edges );
+                ImGui_Dropdown( "Head accuracy mode", { "Below normal", "Normal", "Strict", }, &rage->head_accuracy_mode );
                 SliderInt( "Prefer fake head overlap", &rage->prefer_fakehead_overlap, 0, 100 );
             }
 
@@ -436,7 +475,7 @@ void Gui::Render( ) noexcept {
                 ImGui::Checkbox( "Override hitchance", &rage->minimum_damage_override_hitchance );
                 if ( rage->minimum_damage_override_hitchance ) {
                     SliderInt( "Hitchance primary override", &rage->minimum_hitchance_override_primary, 0, 100 );
-                    SliderInt( "Hitchance secondary override", &rage->minimum_damage_override_secondary, 0, 100 );
+                    SliderInt( "Hitchance secondary override", &rage->minimum_hitchance_override_secondary, 0, 100 );
                 } 
             }
 
@@ -452,10 +491,10 @@ void Gui::Render( ) noexcept {
 
                 std::vector<MultiItem_t> autostopflags{
                     {"Fallback", &rage->autostopflags_fallback },
-                    {"Avoid locking movement", &rage->autostopflags_avoid_locking_movement },
-                    {"Early on lag-delayed", &rage->autostopflags_early_lag_delayed },
-                    {"Early on normal-peek", &rage->autostopflags_early_normal_peek },
-                    {"Early on aggressive-peek", &rage->autostopflags_early_aggresive_peek },
+                    {"Avoid locking movement", &rage->autostopflags_lock },
+                    {"Early on lag-delayed", &rage->autostopflags_lag },
+                    {"Early on normal-peek", &rage->autostopflags_normal },
+                    {"Early on aggressive-peek", &rage->autostopflags_aggr },
                 };
 
                 ImGui_MultiSelect( "Automatic stop flags", autostopflags );
@@ -521,6 +560,15 @@ void Gui::Render( ) noexcept {
             ImGui::Checkbox( "sex2", &g_Vars.misc.sex2 );
             ImGui::Checkbox( "sex3", &g_Vars.misc.sex3 );
 
+            if ( g_cl.m_local ) {
+                int wpn = g_cl.m_local->GetActiveWeapon( )->m_iItemDefinitionIndex( );
+
+                if ( ImGui::Button( "yeah" ) ) {
+                    std::stringstream ss;
+                    ss << "weaponid " << wpn;
+                    Log( ) << ss.str( );
+                }
+            }
         }
         ImGui::EndChild( );
 
@@ -649,9 +697,9 @@ void Gui::Render( ) noexcept {
 }
 
 LRESULT CALLBACK WindowProcess( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) {
-	// toggle menu
-	if ( GetAsyncKeyState( VK_INSERT ) & 1 )
-		g_gui.open = !g_gui.open;
+    // toggle menu
+    if (GetAsyncKeyState(VK_INSERT) & 1)
+        g_gui.open = !g_gui.open;
 
 	// pass msg to imgui
 	if ( g_gui.open && ImGui_ImplWin32_WndProcHandler( hWnd, msg, wParam, lParam ) )
