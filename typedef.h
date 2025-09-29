@@ -498,6 +498,9 @@ public:
 
 template<typename T>
 inline void raw_push_back( RawVector<T>& vec, const T& value ) {
+    *vec.last = value;   // write value into the "slot"
+    ++vec.last;          // advance end pointer
+    /*
     if ( vec.last < vec.capacity ) {
         *vec.last = value;   // write value into the "slot"
         ++vec.last;          // advance end pointer
@@ -507,6 +510,7 @@ inline void raw_push_back( RawVector<T>& vec, const T& value ) {
         // You may want to log or assert here
         throw std::runtime_error( "raw_push_back: no capacity left" );
     }
+    */
 }
 
 class MultiDropdown : public Element {
