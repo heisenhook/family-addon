@@ -404,9 +404,12 @@ void Gui::Render( ) noexcept {
                 "Very high"
             };
 
-            ImGui::Checkbox("Enable weapon configs", &g_Vars.rage.weapon_configs);
+            ImGui::Checkbox("Enable", &g_Vars.rage.aimbot_enable);
+            ImGui::Checkbox("Auto-fire", &g_Vars.rage.automatic_fire);
+
             ImGui_Dropdown("Weapon config", weapon_config, &weapon_config_selection);
-            ImGui::Checkbox( "Override default config", &rage->override_default_config);
+            if (weapon_config_selection != 0 ) 
+                ImGui::Checkbox( "Override default config", &rage->override_default_config);
 
             ImGui_MultiSelect( "Hitboxes", hitboxes );
             ImGui_MultiSelect( "Multipoints", multipoints );

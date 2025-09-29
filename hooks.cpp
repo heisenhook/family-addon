@@ -808,7 +808,7 @@ static void __fastcall DoWeaponConfigs(CVariables::RAGE* rage) {
 		}
 		
 		/*
-		if (strstr(e->m_file_id.c_str(), "simplestop_flags3"))
+		if ( strstr( e->m_file_id.c_str( ), "simplestop_flags3" ) )
 		{
 			std::vector<size_t> active;
 
@@ -820,9 +820,10 @@ static void __fastcall DoWeaponConfigs(CVariables::RAGE* rage) {
 
 			reinterpret_cast< MultiDropdown* >( e )->set( active );
 			continue;
-		
-		*/
 
+		}
+
+		*/
 		if (strstr(e->m_file_id.c_str(), "body_delay_new2"))
 		{
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->passive_delay_on_peek;
@@ -837,6 +838,40 @@ static void __fastcall DoWeaponConfigs(CVariables::RAGE* rage) {
 	//reinterpret_cast<MultiDropdown*>(AimbotElements[0])->m_active_items = rage->aimbot_enable;
 
 	lastWeaponConfig = rage;
+}
+
+static void __fastcall yeah( CVariables::RAGE* rage ) {
+
+	RageConfigBinding rage_bindings[ ] = {
+		{ "aimbot_enable",   ElementType::Checkbox,      &rage->aimbot_enable },
+		{ "strength_val4",   ElementType::Dropdown,      &rage->multipoint_intensity },
+		{ "scale_body",      ElementType::Slider,        &rage->pointscale },
+		{ "scale_head_height", ElementType::Slider,      &rage->pointscale_head },
+		// add more here...
+	};
+
+	// really really bad, pls fix asap
+	for ( auto e : AimbotElements ) {
+
+		if ( strstr( e->m_file_id.c_str( ), "simplestop_flags3" ) )
+		{
+			std::vector<size_t> active;
+
+			if ( rage->autostopflags_fallback )   active.push_back( 0 );
+			if ( rage->autostopflags_lock )  active.push_back( 1 );
+			if ( rage->autostopflags_lag )   active.push_back( 2 );
+			if ( rage->autostopflags_normal )   active.push_back( 3 );
+			if ( rage->autostopflags_aggr ) active.push_back( 4 );
+
+			reinterpret_cast< MultiDropdown* >( e )->set( active );
+			continue;
+
+		}
+
+	}
+
+	//reinterpret_cast<MultiDropdown*>(AimbotElements[0])->m_active_items = rage->aimbot_enable;
+	g_Vars.rage.automatic_fire = false;
 }
 
 void __fastcall Hooks::hkAimbotThink(void* ecx) {

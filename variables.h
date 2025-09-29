@@ -576,6 +576,9 @@ public:
 #pragma region RAGE_GENERAL group
 	group_begin( RAGE_GENERAL );
 
+	config_option( bool, aimbot_enable, false );
+	config_option( bool, automatic_fire, false );
+
 	config_option( int, accuracy, 0 ); // Fake angles, Lag compensation, Override aimbot, Override accuracy
 
 	config_option( bool, weapon_configs, false);
