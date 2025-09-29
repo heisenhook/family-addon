@@ -176,17 +176,12 @@ bool CSGO::init() {
 	g_netvars.init( );
 	g_entoffsets.init( );
 
-	gLogger.attach( "family-addon" );
-	g_memory.init( );
-	g_gui.init( );
-
 	//g_listener.init( );
 	//render::init( );
 	//g_menu.init( );
 	//g_config.LoadHotkeys( );
 	//g_chams.init( );
 	g_hooks.init( );
-	g_Vars.Create( );
 	//g_hooks.init( );
 
 
