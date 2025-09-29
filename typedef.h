@@ -167,7 +167,7 @@ struct RawVector {
         }
 
 #ifdef _DEBUG
-        Log() << "Found vector with " << count << " values at " << std::format("{:X}", (DWORD)first);
+        //Log(INFO) << "Found vector with " << count << " values at " << std::format("{:X}", (DWORD)first);
 #endif
         return out;
     }

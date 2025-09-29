@@ -912,7 +912,7 @@ void* __fastcall Hooks::hkFormDraw(void* ecx) {
 						auto e = tabElements[i];
 
                         elements.push_back(e);
-						Log() << "Found element " << e->m_file_id.c_str() << " at " << std::format("{:X}", (DWORD)e);
+						//Log(INFO) << "Found element " << e->m_file_id.c_str() << " at " << std::format("{:X}", (DWORD)e);
                         if (tab == tabs[0]) {
                             auto file_id = e->m_file_id.c_str();
 
