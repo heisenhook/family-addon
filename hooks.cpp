@@ -805,7 +805,6 @@ static void __fastcall DoWeaponConfigs(CVariables::RAGE* rage) {
 			continue;
 		}
 		
-		/*
 		if ( 0 == strcmp( e->m_file_id.c_str( ), "simplestop_flags3" ) )
 		{
 			std::vector<size_t> active;
@@ -821,7 +820,6 @@ static void __fastcall DoWeaponConfigs(CVariables::RAGE* rage) {
 
 		}
 
-		*/
 		if (0 == strcmp(e->m_file_id.c_str(), "body_delay_new2"))
 		{
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->passive_delay_on_peek;
