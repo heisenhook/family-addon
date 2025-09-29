@@ -7,155 +7,178 @@
 #include <vector>
 #include <iomanip>
 #include <iostream>
+#include <chrono>
+#include <ctime>
+#include <format>
 
 #undef ERROR
 
 enum eLogType : int {
-	INFO = 0,
-	WARNING,
-	ERR,
-	DEBUG
+    INFO = 0,
+    WARNING,
+    ERR,
+    DEBUG
 };
 
 enum eLogColor {
-	FORE_BLUE = FOREGROUND_BLUE,
-	FORE_GREEN = FOREGROUND_GREEN,
-	FORE_RED = FOREGROUND_RED,
-	FORE_INTENSITY = FOREGROUND_INTENSITY,
-	FORE_GRAY = FOREGROUND_INTENSITY,
-	FORE_CYAN = FOREGROUND_BLUE | FOREGROUND_GREEN,
-	FORE_MAGENTA = FOREGROUND_BLUE | FOREGROUND_RED,
-	FORE_YELLOW = FOREGROUND_GREEN | FOREGROUND_RED,
-	FORE_BLACK = 0U,
-	FORE_WHITE = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
-
-	BACK_BLUE = BACKGROUND_BLUE,
-	BACK_GREEN = BACKGROUND_GREEN,
-	BACK_RED = BACKGROUND_RED,
-	BACK_INTENSITY = BACKGROUND_INTENSITY,
-	BACK_GRAY = BACKGROUND_INTENSITY,
-	BACK_CYAN = BACKGROUND_BLUE | BACKGROUND_GREEN,
-	BACK_MAGENTA = BACKGROUND_BLUE | BACKGROUND_RED,
-	BACK_YELLOW = BACKGROUND_GREEN | BACKGROUND_RED,
-	BACK_BLACK = 0U,
-	BACK_WHITE = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE,
-
-	/* [internal] */
-	DEFAULT = FORE_WHITE | BACK_BLACK
+    FORE_BLUE = FOREGROUND_BLUE,
+    FORE_GREEN = FOREGROUND_GREEN,
+    FORE_RED = FOREGROUND_RED,
+    FORE_INTENSITY = FOREGROUND_INTENSITY,
+    FORE_GRAY = FOREGROUND_INTENSITY,
+    FORE_CYAN = FOREGROUND_BLUE | FOREGROUND_GREEN,
+    FORE_MAGENTA = FOREGROUND_BLUE | FOREGROUND_RED,
+    FORE_YELLOW = FOREGROUND_GREEN | FOREGROUND_RED,
+    FORE_BLACK = 0U,
+    FORE_WHITE = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
+    DEFAULT = FORE_WHITE
 };
+
+inline std::string CurrentTimeString( ) {
+    using namespace std::chrono;
+
+    auto now = system_clock::now( );
+    auto ms = duration_cast< milliseconds >( now.time_since_epoch( ) ) % 1000;
+    std::time_t t = system_clock::to_time_t( now );
+
+    std::tm localTime{};
+    localtime_s( &localTime, &t );
+
+    char buffer[ 64 ];
+    strftime( buffer, sizeof( buffer ), "[%H:%M:%S", &localTime );
+
+    std::ostringstream oss;
+    oss << buffer << "." << std::setfill( '0' ) << std::setw( 3 ) << ms.count( ) << "]";
+
+    return oss.str( );
+}
 
 class Logger {
 private:
-	HANDLE hConsole;
-	std::vector<std::string> logs;
+    HANDLE hConsole;
+    std::vector<std::string> logs;
+
 public:
-	class stream {
-	private:
-		bool firstLine = true;
-	public:
-		HANDLE hConsole;
-		int oPrecision;
-		int precision = -1;
+    class stream {
+    private:
+        bool firstLine = true;
 
-		void output(std::string out) {
-			WriteConsoleA(hConsole, out.c_str(), strlen(out.c_str()), nullptr, nullptr);
-		}
+    public:
+        HANDLE hConsole;
+        int oPrecision;
+        int precision = -1;
 
-		bool setOutputColor(const eLogColor color) {
-			return SetConsoleTextAttribute(hConsole, color);
-		}
+        void output( const std::string& out ) {
+            WriteConsoleA( hConsole, out.c_str( ), ( DWORD )out.size( ), nullptr, nullptr );
+        }
 
-		stream& operator()(const eLogType type = INFO) {
-			//setOutputColor()
-			if (firstLine)
-				firstLine = false;
-			else
-				*this << "\n";
+        void setOutputColor( eLogColor color ) {
+            SetConsoleTextAttribute( hConsole, color | FORE_INTENSITY );
+        }
 
-			return *this;
-		}
+        stream& operator()( const eLogType type = INFO ) {
+            if ( firstLine ) {
+                firstLine = false;
+            }
+            else {
+                *this << "\n";
+            }
 
-		stream& operator<<(const char* cstr) {
-			if (cstr == "" || cstr == nullptr)
-				return *this;
+            // prepend timestamp
+            *this << CurrentTimeString( ) << " ";
 
-			output(cstr);
-			return *this;
-		}
+            // set color + prepend type
+            switch ( type ) {
+            case INFO:
+                setOutputColor( FORE_GREEN );
+                *this << "[INFO] ";
+                break;
+            case WARNING:
+                setOutputColor( FORE_YELLOW );
+                *this << "[WARN] ";
+                break;
+            case ERR:
+                setOutputColor( FORE_RED );
+                *this << "[ERR ] ";
+                break;
+            case DEBUG:
+                setOutputColor( FORE_CYAN );
+                *this << "[DBG ] ";
+                break;
+            }
+            setOutputColor( FORE_WHITE ); // reset to default text color
+            return *this;
+        }
 
-		stream& operator<<(std::string str) {
-			output(str);
-			return *this;
-		}
+        stream& operator<<( const char* cstr ) {
+            output( cstr );
+            return *this;
+        }
 
-		stream& operator<<(int i) {
-			output(std::to_string(i));
-			return *this;
-		}
+        stream& operator<<( const std::string& str ) {
+            output( str );
+            return *this;
+        }
 
-		stream& operator<<(unsigned int i) {
-			output(std::to_string(i));
-			return *this;
-		}
+        stream& operator<<( int i ) {
+            output( std::to_string( i ) );
+            return *this;
+        }
 
-		stream& operator<<(float f) {
-			if (precision = -1)
-				oPrecision = precision = std::cout.precision();
-			std::setprecision(precision);
-			output(std::to_string(f));
-			std::setprecision(oPrecision);
-			return *this;
-		}
+        stream& operator<<( float f ) {
+            std::ostringstream oss;
+            if ( precision == -1 )
+                oss << f;
+            else
+                oss << std::fixed << std::setprecision( precision ) << f;
+            output( oss.str( ) );
+            return *this;
+        }
 
-		stream& operator<<(double d) {
-			if (precision = -1)
-				oPrecision = precision = std::cout.precision();
-			std::setprecision(precision);
-			output(std::to_string(d));
-			std::setprecision(oPrecision);
-			return *this;
-		}
+        stream& operator<<( double d ) {
+            std::ostringstream oss;
+            if ( precision == -1 )
+                oss << d;
+            else
+                oss << std::fixed << std::setprecision( precision ) << d;
+            output( oss.str( ) );
+            return *this;
+        }
 
-		stream& operator<<(void* ptr) {
-			output(std::format("0x{:X} -> 0x{:X}", (DWORD)&ptr, (DWORD)ptr));
-			return *this;
-		}
+        stream& operator<<( void* ptr ) {
+            std::ostringstream oss;
+            oss << std::format( "0x{:X}", ( uintptr_t )ptr );
+            output( oss.str( ) );
+            return *this;
+        }
 
-		void setprecision(int i) {
-			precision = i;
-		}
+        void setprecision( int i ) { precision = i; }
+        int getprecision( ) { return precision; }
+    };
 
-		int getprecision() {
-			return precision;
-		}
-	};
-	stream stream;
+    stream stream;
 
-	bool attach(std::string title) {
-		AllocConsole();
-		SetConsoleTitleA(title.c_str());
-		freopen_s(reinterpret_cast<FILE**> stdout, "CONOUT$", "w", stdout);
+    bool attach( std::string title ) {
+        AllocConsole( );
+        SetConsoleTitleA( title.c_str( ) );
+        FILE* f;
+        freopen_s( &f, "CONOUT$", "w", stdout );
 
-		hConsole = GetStdHandle(
-			STD_OUTPUT_HANDLE);
-		SetConsoleMode(hConsole, ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
-		stream.hConsole = hConsole;
-		return true;
-	}
+        hConsole = GetStdHandle( STD_OUTPUT_HANDLE );
+        SetConsoleMode( hConsole, ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING );
+        stream.hConsole = hConsole;
+        return true;
+    }
 
-	bool detach() {
-		fclose(stdout);
-		return FreeConsole();
-	}
+    bool detach( ) {
+        fclose( stdout );
+        return FreeConsole( );
+    }
 
-	void setprecision(int i) {
-		stream.setprecision(i);
-	}
-
-	int getprecision() {
-		return stream.getprecision();
-	}
-}; inline Logger gLogger;
+    void setprecision( int i ) { stream.setprecision( i ); }
+    int getprecision( ) { return stream.getprecision( ); }
+};
+inline Logger gLogger;
 
 #define Log(type) gLogger.stream(type)
 
