@@ -364,207 +364,205 @@ struct RageConfigBinding {
 void GetDefaultRageConfig() {
 
 	for (auto e : AimbotElements) {
-
-
-		if (strstr(e->m_file_id.c_str(), "aimbot_enable")) {
+		if (0 == strcmp(e->m_file_id.c_str(), "aimbot_enable")) {
 			g_Vars.rage_default.aimbot_enable = reinterpret_cast<Checkbox*>(e)->enabled;
 			continue;
 		}
 
-		//if (strstr(e->m_file_id.c_str(), "hitbox"))
+		//if (0 == strcmp(e->m_file_id.c_str(), "hitbox"))
 		//{	
 		//	reinterpret_cast<MultiDropdown*>(e)->enabled = rage->aimbot_enable;
 		//	continue;
 		//}
 
-		if (strstr(e->m_file_id.c_str(), "strength_val4"))
+		if (0 == strcmp(e->m_file_id.c_str(), "strength_val4"))
 		{
 			g_Vars.rage_default.multipoint_intensity = reinterpret_cast<Dropdown*>(e)->selected_index;
 			continue;
 		}
 
-		if (strstr(e->m_file_id.c_str(), "scale_body"))
+		if (0 == strcmp(e->m_file_id.c_str(), "scale_body"))
 		{
 			g_Vars.rage_default.pointscale = reinterpret_cast<Slider*>(e)->value;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "scale_head_height"))
+		if (0 == strcmp(e->m_file_id.c_str(), "scale_head_height"))
 		{
 			g_Vars.rage_default.maximum_aim_height = reinterpret_cast<Slider*>(e)->value;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "scale_custom"))
+		if (0 == strcmp(e->m_file_id.c_str(), "scale_custom"))
 		{
 			g_Vars.rage_default.seperate_pointscale = reinterpret_cast<Checkbox*>(e)->enabled;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "scale_head"))
+		if (0 == strcmp(e->m_file_id.c_str(), "scale_head"))
 		{
 			g_Vars.rage_default.pointscale_head = reinterpret_cast<Slider*>(e)->value;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "scale_limbs"))
+		if (0 == strcmp(e->m_file_id.c_str(), "scale_limbs"))
 		{
 			g_Vars.rage_default.pointscale_limbs = reinterpret_cast<Slider*>(e)->value;
 			continue;
 		}
 
-		if (strstr(e->m_file_id.c_str(), "mindamage"))
+		if (0 == strcmp(e->m_file_id.c_str(), "mindamage"))
 		{
 			g_Vars.rage_default.minimum_damage = reinterpret_cast<Slider*>(e)->value;
 			continue;
 		}
 
-		//if (strstr(e->m_file_id.c_str(), "body_flags_new4"))
+		//if (0 == strcmp(e->m_file_id.c_str(), "body_flags_new4"))
 		//{	
 		//	reinterpret_cast<MultiDropdown*>(e)->enabled = g_Vars.rage_default.aimbot_enable;
 		//	continue;
 		//}
-		//if (strstr(e->m_file_id.c_str(), "damage_flags_new4"))
+		//if (0 == strcmp(e->m_file_id.c_str(), "damage_flags_new4"))
 		//{	
 		//	reinterpret_cast<MultiDropdown*>(e)->enabled = g_Vars.rage_default.aimbot_enable;
 		//	continue;
 		//}
 
-		if (strstr(e->m_file_id.c_str(), "scan_intensity"))
+		if (0 == strcmp(e->m_file_id.c_str(), "scan_intensity"))
 		{
 			g_Vars.rage_default.multipoint_intensity = reinterpret_cast<Dropdown*>(e)->selected_index;
 			continue;
 		}
 
-		if (strstr(e->m_file_id.c_str(), "hitchance"))
+		if (0 == strcmp(e->m_file_id.c_str(), "hitchance"))
 		{
 			g_Vars.rage_default.minimum_hitchance = reinterpret_cast<Slider*>(e)->value;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "hitchance_ratio"))
+		if (0 == strcmp(e->m_file_id.c_str(), "hitchance_ratio"))
 		{
 			g_Vars.rage_default.prefer_hitchance = reinterpret_cast<Slider*>(e)->value;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "prefer_baim"))
+		if (0 == strcmp(e->m_file_id.c_str(), "prefer_baim"))
 		{
 			g_Vars.rage_default.prefer_baim = reinterpret_cast<Slider*>(e)->value;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "workdamage"))
+		if (0 == strcmp(e->m_file_id.c_str(), "workdamage"))
 		{
 			g_Vars.rage_default.minimal_assessed_damage = reinterpret_cast<Slider*>(e)->value;
 			continue;
 		}
 
-		//if (strstr(e->m_file_id.c_str(), "aimbot_autostop"))
+		//if (0 == strcmp(e->m_file_id.c_str(), "aimbot_autostop"))
 		//{
 		//	reinterpret_cast<MultiDropdown*>(e)->enabled = g_Vars.rage_default.aimbot_enable;
 		//	continue; 
 		//}
 
-		if (strstr(e->m_file_id.c_str(), "head_baim"))
+		if (0 == strcmp(e->m_file_id.c_str(), "head_baim"))
 		{
 			g_Vars.rage_default.standing_baim = reinterpret_cast<Dropdown*>(e)->selected_index;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "ground_strict"))
+		if (0 == strcmp(e->m_file_id.c_str(), "ground_strict"))
 		{
 			g_Vars.rage_default.strict_standing_baim = reinterpret_cast<Dropdown*>(e)->selected_index;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "air_baim"))
+		if (0 == strcmp(e->m_file_id.c_str(), "air_baim"))
 		{
 			g_Vars.rage_default.air_baim = reinterpret_cast<Dropdown*>(e)->selected_index;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "air_limit"))
+		if (0 == strcmp(e->m_file_id.c_str(), "air_limit"))
 		{
 			g_Vars.rage_default.limit_air_pointscale = reinterpret_cast<Slider*>(e)->value;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "air_nonstrict"))
+		if (0 == strcmp(e->m_file_id.c_str(), "air_nonstrict"))
 		{
 			g_Vars.rage_default.strict_air_baim = reinterpret_cast<Dropdown*>(e)->selected_index;
 			continue;
 		}
 
-		if (strstr(e->m_file_id.c_str(), "body_accuracy"))
+		if (0 == strcmp(e->m_file_id.c_str(), "body_accuracy"))
 		{
 			g_Vars.rage_default.avoid_body_edges = reinterpret_cast<Dropdown*>(e)->selected_index;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "body_safe"))
+		if (0 == strcmp(e->m_file_id.c_str(), "body_safe"))
 		{
 			g_Vars.rage_default.prefer_fakebody_overlap = reinterpret_cast<Slider*>(e)->value;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "head_accuracy2"))
+		if (0 == strcmp(e->m_file_id.c_str(), "head_accuracy2"))
 		{
 			g_Vars.rage_default.head_accuracy_mode = reinterpret_cast<Dropdown*>(e)->selected_index;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "head_safe"))
+		if (0 == strcmp(e->m_file_id.c_str(), "head_safe"))
 		{
 			g_Vars.rage_default.prefer_fakehead_overlap = reinterpret_cast<Slider*>(e)->value;
 			continue;
 		}
 
-		if (strstr(e->m_file_id.c_str(), "mindamagealt"))
+		if (0 == strcmp(e->m_file_id.c_str(), "mindamagealt"))
 		{
 			g_Vars.rage_default.minimum_damage_override_primary = reinterpret_cast<Slider*>(e)->value;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "mindamagealt2"))
+		if (0 == strcmp(e->m_file_id.c_str(), "mindamagealt2"))
 		{
 			g_Vars.rage_default.minimum_damage_override_secondary = reinterpret_cast<Slider*>(e)->value;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "override_hitchances"))
+		if (0 == strcmp(e->m_file_id.c_str(), "override_hitchances"))
 		{
 			g_Vars.rage_default.minimum_damage_override_hitchance = reinterpret_cast<Checkbox*>(e)->enabled;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "hitchancealt"))
+		if (0 == strcmp(e->m_file_id.c_str(), "hitchancealt"))
 		{
 			g_Vars.rage_default.minimum_hitchance_override_primary = reinterpret_cast<Slider*>(e)->value;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "hitchancealt2"))
+		if (0 == strcmp(e->m_file_id.c_str(), "hitchancealt2"))
 		{
 			g_Vars.rage_default.minimum_hitchance_override_secondary = reinterpret_cast<Slider*>(e)->value;
 			continue;
 		}
 
 
-		if (strstr(e->m_file_id.c_str(), "reduce_hitchance_longrange2"))
+		if (0 == strcmp(e->m_file_id.c_str(), "reduce_hitchance_longrange2"))
 		{
 			g_Vars.rage_default.reduce_hitchance = reinterpret_cast<Checkbox*>(e)->enabled;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "longrange_hc"))
+		if (0 == strcmp(e->m_file_id.c_str(), "longrange_hc"))
 		{
 			g_Vars.rage_default.reduce_hitchance_value = reinterpret_cast<Slider*>(e)->value;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "longrange_time"))
+		if (0 == strcmp(e->m_file_id.c_str(), "longrange_time"))
 		{
 			g_Vars.rage_default.reduce_hitchance_delay = reinterpret_cast<Slider*>(e)->value;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "longrange_activates_with_low_md"))
+		if (0 == strcmp(e->m_file_id.c_str(), "longrange_activates_with_low_md"))
 		{
 			g_Vars.rage_default.reduce_hitchance_damage_override = reinterpret_cast<Checkbox*>(e)->enabled;
 			continue;
 		}
 
-		//if (strstr(e->m_file_id.c_str(), "simplestop_flags3"))
+		//if (0 == strcmp(e->m_file_id.c_str(), "simplestop_flags3"))
 		//{
 		//	reinterpret_cast<MultiDropdown*>(e)->enabled = g_Vars.rage_default.aimbot_enable;
 		//	continue; 
 		//}
-		if (strstr(e->m_file_id.c_str(), "body_delay_new2"))
+		if (0 == strcmp(e->m_file_id.c_str(), "body_delay_new2"))
 		{
 			g_Vars.rage_default.passive_delay_on_peek = reinterpret_cast<Dropdown*>(e)->selected_index;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "body_force"))
+		if (0 == strcmp(e->m_file_id.c_str(), "body_force"))
 		{
 			g_Vars.rage_default.force_delay_on_peek = reinterpret_cast<Dropdown*>(e)->selected_index;
 			continue;
@@ -587,7 +585,7 @@ static void __fastcall DoWeaponConfigs(CVariables::RAGE* rage) {
 	// really really bad, pls fix asap
 	for (auto e : AimbotElements) {
 
-		if (strstr(e->m_file_id.c_str(), "hitbox"))
+		if (0 == strcmp(e->m_file_id.c_str(), "hitbox"))
 		{
 			std::vector<size_t> active;
 
@@ -603,7 +601,7 @@ static void __fastcall DoWeaponConfigs(CVariables::RAGE* rage) {
 			continue;
 		}
 
-		if ( strstr( e->m_file_id.c_str( ), "multipoint" ) )
+		if ( 0 == strcmp( e->m_file_id.c_str( ), "multipoint" ) )
 		{
 			std::vector<size_t> active;
 
@@ -619,83 +617,83 @@ static void __fastcall DoWeaponConfigs(CVariables::RAGE* rage) {
 			continue;
 		}
 
-		if (strstr(e->m_file_id.c_str(), "strength_val4"))
+		if (0 == strcmp(e->m_file_id.c_str(), "strength_val4"))
 		{
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->multipoint_intensity;
 			continue;
 		}
 
-		if (strstr(e->m_file_id.c_str(), "scale_body"))
+		if (0 == strcmp(e->m_file_id.c_str(), "scale_body"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->pointscale;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "scale_head_height"))
+		if (0 == strcmp(e->m_file_id.c_str(), "scale_head_height"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->maximum_aim_height;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "scale_custom"))
+		if (0 == strcmp(e->m_file_id.c_str(), "scale_custom"))
 		{
 			reinterpret_cast<Checkbox*>(e)->enabled = rage->seperate_pointscale;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "scale_head"))
+		if (0 == strcmp(e->m_file_id.c_str(), "scale_head"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->pointscale_head;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "scale_limbs"))
+		if (0 == strcmp(e->m_file_id.c_str(), "scale_limbs"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->pointscale_limbs;
 			continue;
 		}
 
-		if (strstr(e->m_file_id.c_str(), "mindamage"))
+		if (0 == strcmp(e->m_file_id.c_str(), "mindamage"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->minimum_damage;
 			continue;
 		}
 
-		//if (strstr(e->m_file_id.c_str(), "body_flags_new4"))
+		//if (0 == strcmp(e->m_file_id.c_str(), "body_flags_new4"))
 		//{	
 		//	reinterpret_cast<MultiDropdown*>(e)->enabled = g_Vars.rage_default.aimbot_enable;
 		//	continue;
 		//}
-		//if (strstr(e->m_file_id.c_str(), "damage_flags_new4"))
+		//if (0 == strcmp(e->m_file_id.c_str(), "damage_flags_new4"))
 		//{	
 		//	reinterpret_cast<MultiDropdown*>(e)->enabled = g_Vars.rage_default.aimbot_enable;
 		//	continue;
 		//}
 
-		if (strstr(e->m_file_id.c_str(), "scan_intensity"))
+		if (0 == strcmp(e->m_file_id.c_str(), "scan_intensity"))
 		{
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->multipoint_intensity;
 			continue;
 		}
 
-		if (strstr(e->m_file_id.c_str(), "hitchance"))
+		if (0 == strcmp(e->m_file_id.c_str(), "hitchance"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->minimum_hitchance;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "hitchance_ratio"))
+		if (0 == strcmp(e->m_file_id.c_str(), "hitchance_ratio"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->prefer_hitchance;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "prefer_baim"))
+		if (0 == strcmp(e->m_file_id.c_str(), "prefer_baim"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->prefer_baim;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "workdamage"))
+		if (0 == strcmp(e->m_file_id.c_str(), "workdamage"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->minimal_assessed_damage;
 			continue;
 		}
 		
-		if ( strstr( e->m_file_id.c_str( ), "aimbot_autostop" ) )
+		if ( 0 == strcmp( e->m_file_id.c_str( ), "aimbot_autostop" ) )
 		{
 			std::vector<size_t> active;
 
@@ -712,103 +710,103 @@ static void __fastcall DoWeaponConfigs(CVariables::RAGE* rage) {
 		}
 		
 
-		if (strstr(e->m_file_id.c_str(), "head_baim"))
+		if (0 == strcmp(e->m_file_id.c_str(), "head_baim"))
 		{
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->standing_baim;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "ground_strict"))
+		if (0 == strcmp(e->m_file_id.c_str(), "ground_strict"))
 		{
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->strict_standing_baim;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "air_baim"))
+		if (0 == strcmp(e->m_file_id.c_str(), "air_baim"))
 		{
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->air_baim;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "air_limit"))
+		if (0 == strcmp(e->m_file_id.c_str(), "air_limit"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->limit_air_pointscale;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "air_nonstrict"))
+		if (0 == strcmp(e->m_file_id.c_str(), "air_nonstrict"))
 		{
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->strict_air_baim;
 			continue;
 		}
 
-		if (strstr(e->m_file_id.c_str(), "body_accuracy"))
+		if (0 == strcmp(e->m_file_id.c_str(), "body_accuracy"))
 		{
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->avoid_body_edges;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "body_safe"))
+		if (0 == strcmp(e->m_file_id.c_str(), "body_safe"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->prefer_fakebody_overlap;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "head_accuracy2"))
+		if (0 == strcmp(e->m_file_id.c_str(), "head_accuracy2"))
 		{
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->head_accuracy_mode;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "head_safe"))
+		if (0 == strcmp(e->m_file_id.c_str(), "head_safe"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->prefer_fakehead_overlap;
 			continue;
 		}
 
-		if (strstr(e->m_file_id.c_str(), "mindamagealt"))
+		if (0 == strcmp(e->m_file_id.c_str(), "mindamagealt"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->minimum_damage_override_primary;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "mindamagealt2"))
+		if (0 == strcmp(e->m_file_id.c_str(), "mindamagealt2"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->minimum_damage_override_secondary;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "override_hitchances"))
+		if (0 == strcmp(e->m_file_id.c_str(), "override_hitchances"))
 		{
 			reinterpret_cast<Checkbox*>(e)->enabled = rage->minimum_damage_override_hitchance;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "hitchancealt"))
+		if (0 == strcmp(e->m_file_id.c_str(), "hitchancealt"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->minimum_hitchance_override_primary;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "hitchancealt2"))
+		if (0 == strcmp(e->m_file_id.c_str(), "hitchancealt2"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->minimum_hitchance_override_secondary;
 			continue;
 		}
 
 
-		if (strstr(e->m_file_id.c_str(), "reduce_hitchance_longrange2"))
+		if (0 == strcmp(e->m_file_id.c_str(), "reduce_hitchance_longrange2"))
 		{
 			reinterpret_cast<Checkbox*>(e)->enabled = rage->reduce_hitchance;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "longrange_hc"))
+		if (0 == strcmp(e->m_file_id.c_str(), "longrange_hc"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->reduce_hitchance_value;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "longrange_time"))
+		if (0 == strcmp(e->m_file_id.c_str(), "longrange_time"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->reduce_hitchance_delay;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "longrange_activates_with_low_md"))
+		if (0 == strcmp(e->m_file_id.c_str(), "longrange_activates_with_low_md"))
 		{
 			reinterpret_cast<Checkbox*>(e)->enabled = rage->reduce_hitchance_damage_override;
 			continue;
 		}
 		
 		/*
-		if ( strstr( e->m_file_id.c_str( ), "simplestop_flags3" ) )
+		if ( 0 == strcmp( e->m_file_id.c_str( ), "simplestop_flags3" ) )
 		{
 			std::vector<size_t> active;
 
@@ -824,12 +822,12 @@ static void __fastcall DoWeaponConfigs(CVariables::RAGE* rage) {
 		}
 
 		*/
-		if (strstr(e->m_file_id.c_str(), "body_delay_new2"))
+		if (0 == strcmp(e->m_file_id.c_str(), "body_delay_new2"))
 		{
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->passive_delay_on_peek;
 			continue;
 		}
-		if (strstr(e->m_file_id.c_str(), "body_force"))
+		if (0 == strcmp(e->m_file_id.c_str(), "body_force"))
 		{
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->force_delay_on_peek;
 			continue;
@@ -853,7 +851,7 @@ static void __fastcall yeah( CVariables::RAGE* rage ) {
 	// really really bad, pls fix asap
 	for ( auto e : AimbotElements ) {
 
-		if ( strstr( e->m_file_id.c_str( ), "simplestop_flags3" ) )
+		if ( 0 == strcmp( e->m_file_id.c_str( ), "simplestop_flags3" ) )
 		{
 			std::vector<size_t> active;
 
@@ -876,7 +874,7 @@ static void __fastcall yeah( CVariables::RAGE* rage ) {
 
 void __fastcall Hooks::hkAimbotThink(void* ecx) {
     // do weapon configs here
-    if (g_Vars.rage.weapon_configs) {
+    if (!g_Vars.misc.disable_adaptive_weapons) {
 		if (!g_familyCl) {
 			g_familyCl = reinterpret_cast<FamilyHookClient*>(familyhookBase + 0x1BB700);
 			GetDefaultRageConfig();
@@ -902,7 +900,7 @@ void* __fastcall Hooks::hkFormDraw(void* ecx) {
     if (!form)
         form = reinterpret_cast<Form*>(familyhookBase + 0x141ED0);
 
-    g_gui.open = form->m_open;
+    //g_gui.open = form->m_open;
 
     if (tabs.size() == 0) {
         if (form) {
