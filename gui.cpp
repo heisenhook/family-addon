@@ -303,6 +303,62 @@ inline bool SliderInt( const char* label, int* v, int v_min, int v_max, const ch
     return active;
 }
 
+inline bool SliderFloat( const char* label, float* v, float v_min, float v_max, const char* format = "%d" ) {
+    ImGui::TextUnformatted( label );
+
+    ImGui::SetNextItemWidth( 174 );
+
+    // Invisible interaction area
+    ImGui::InvisibleButton( ( std::string( "##" ) + label ).c_str( ), ImVec2( 174, 6 ) );
+    bool hovered = ImGui::IsItemHovered( );
+    bool active = ImGui::IsItemActive( );
+
+    // Handle mouse input
+    if ( active && ImGui::GetIO( ).MouseDown[ 0 ] ) {
+        ImVec2 pos = ImGui::GetItemRectMin( );
+        ImVec2 size = ImGui::GetItemRectSize( );
+        float t = ( ImGui::GetIO( ).MousePos.x - pos.x ) / size.x;
+        t = ( t < 0.f ) ? 0.f : ( t > 1.f ) ? 1.f : t;
+        *v = int( v_min + t * ( v_max - v_min ) );
+    }
+
+    // Draw the bar
+    ImDrawList* dl = ImGui::GetWindowDrawList( );
+    ImVec2 min = ImGui::GetItemRectMin( );
+    ImVec2 max = ImGui::GetItemRectMax( );
+    ImU32 bg_col = IM_COL32( 50, 50, 50, 255 );
+    ImU32 fill_col = IM_COL32( 0, 180, 255, 255 );
+
+    dl->AddRectFilled( min, max, bg_col, 0.f );  // background
+    float t = float( *v - v_min ) / float( v_max - v_min );
+    ImVec2 fill_max = ImVec2( min.x + ( max.x - min.x ) * t, max.y );
+    dl->AddRectFilled( min, fill_max, fill_col, 0.f ); // fill
+
+    // Draw value text with background for readability
+    char buf[ 32 ];
+    sprintf( buf, format, *v );
+    ImVec2 text_size = ImGui::CalcTextSize( buf );
+    ImVec2 text_pos = ImVec2( fill_max.x - text_size.x / 2, min.y - 4 );
+
+    ImU32 text_col = IM_COL32( 255, 255, 255, 255 );   // White text
+    ImU32 outline_col = IM_COL32( 0, 0, 0, 100 );      // Black outline
+
+    // Draw outline by drawing text in 8 directions around original position
+    for ( int x = -1; x <= 1; x++ )
+    {
+        for ( int y = -1; y <= 1; y++ )
+        {
+            if ( x != 0 || y != 0 )
+                dl->AddText( ImVec2( text_pos.x + x, text_pos.y + y ), outline_col, buf );
+        }
+    }
+
+    // Draw main text on top
+    dl->AddText( text_pos, text_col, buf );
+
+    return active;
+}
+
 void Gui::Render( ) noexcept {
 	ImGui_ImplDX9_NewFrame( );
 	ImGui_ImplWin32_NewFrame( );
@@ -485,7 +541,7 @@ void Gui::Render( ) noexcept {
 
                 if ( rage->reduce_hitchance ) {
                     SliderInt( "Reduced hitchance", &rage->reduce_hitchance_value, 0, 100 );
-                    SliderInt( "Period to wait until reducing", &rage->reduce_hitchance_delay, 0, 250 );
+                    SliderInt( "Period to wait until reducing", &rage->reduce_hitchance_delay, 0.f, 250.f );
                     ImGui::Checkbox( "Reduce hitchance with damage override", &rage->reduce_hitchance_damage_override );
                 }
 

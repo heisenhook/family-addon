@@ -628,21 +628,25 @@ static void __fastcall DoWeaponConfigs(CVariables::RAGE* rage) {
 			reinterpret_cast<Slider*>(e)->value = rage->pointscale;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "scale_head_height"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->maximum_aim_height;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "scale_custom"))
 		{
 			reinterpret_cast<Checkbox*>(e)->enabled = rage->seperate_pointscale;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "scale_head"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->pointscale_head;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "scale_limbs"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->pointscale_limbs;
@@ -677,16 +681,19 @@ static void __fastcall DoWeaponConfigs(CVariables::RAGE* rage) {
 			reinterpret_cast<Slider*>(e)->value = rage->minimum_hitchance;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "hitchance_ratio"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->prefer_hitchance;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "prefer_baim"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->prefer_baim;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "workdamage"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->minimal_assessed_damage;
@@ -709,27 +716,30 @@ static void __fastcall DoWeaponConfigs(CVariables::RAGE* rage) {
 			continue;
 		}
 		
-
 		if (0 == strcmp(e->m_file_id.c_str(), "head_baim"))
 		{
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->standing_baim;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "ground_strict"))
 		{
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->strict_standing_baim;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "air_baim"))
 		{
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->air_baim;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "air_limit"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->limit_air_pointscale;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "air_nonstrict"))
 		{
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->strict_air_baim;
@@ -741,16 +751,19 @@ static void __fastcall DoWeaponConfigs(CVariables::RAGE* rage) {
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->avoid_body_edges;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "body_safe"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->prefer_fakebody_overlap;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "head_accuracy2"))
 		{
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->head_accuracy_mode;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "head_safe"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->prefer_fakehead_overlap;
@@ -762,43 +775,49 @@ static void __fastcall DoWeaponConfigs(CVariables::RAGE* rage) {
 			reinterpret_cast<Slider*>(e)->value = rage->minimum_damage_override_primary;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "mindamagealt2"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->minimum_damage_override_secondary;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "override_hitchances"))
 		{
 			reinterpret_cast<Checkbox*>(e)->enabled = rage->minimum_damage_override_hitchance;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "hitchancealt"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->minimum_hitchance_override_primary;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "hitchancealt2"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->minimum_hitchance_override_secondary;
 			continue;
 		}
 
-
-		if (0 == strcmp(e->m_file_id.c_str(), "reduce_hitchance_longrange2"))
+		if (0 == strcmp(e->m_file_id.c_str(), "reduce_hc_longrange2"))
 		{
 			reinterpret_cast<Checkbox*>(e)->enabled = rage->reduce_hitchance;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "longrange_hc"))
 		{
 			reinterpret_cast<Slider*>(e)->value = rage->reduce_hitchance_value;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "longrange_time"))
 		{
-			reinterpret_cast<Slider*>(e)->value = rage->reduce_hitchance_delay;
+			reinterpret_cast<Slider*>(e)->value = rage->reduce_hitchance_delay / 2.5f;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "longrange_activates_with_low_md"))
 		{
 			reinterpret_cast<Checkbox*>(e)->enabled = rage->reduce_hitchance_damage_override;
@@ -825,11 +844,13 @@ static void __fastcall DoWeaponConfigs(CVariables::RAGE* rage) {
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->passive_delay_on_peek;
 			continue;
 		}
+
 		if (0 == strcmp(e->m_file_id.c_str(), "body_force"))
 		{
 			reinterpret_cast<Dropdown*>(e)->selected_index = rage->force_delay_on_peek;
 			continue;
 		}
+
 	}
 	//reinterpret_cast<MultiDropdown*>(AimbotElements[0])->m_active_items = rage->aimbot_enable;
 
