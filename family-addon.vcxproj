@@ -226,6 +226,7 @@
     <ClInclude Include="pe.h" />
     <ClInclude Include="prediction.h" />
     <ClInclude Include="pstdint.h" />
+    <ClInclude Include="resolver.h" />
     <ClInclude Include="sdk.h" />
     <ClInclude Include="gui_supremacy.h" />
     <ClInclude Include="slider.h" />
@@ -274,6 +275,7 @@
     <ClCompile Include="imgui_widgets.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="memory.cpp" />
+    <ClCompile Include="resolver.cpp" />
     <ClCompile Include="trampoline.c" />
     <ClCompile Include="variables.cpp" />
   </ItemGroup>
