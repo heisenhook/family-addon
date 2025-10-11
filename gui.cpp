@@ -532,6 +532,7 @@ void Gui::Render( ) noexcept {
                 if ( rage->minimum_damage_override_hitchance ) {
                     SliderInt( "Hitchance primary override", &rage->minimum_hitchance_override_primary, 0, 100 );
                     SliderInt( "Hitchance secondary override", &rage->minimum_hitchance_override_secondary, 0, 100 );
+                    ImGui::Checkbox( "Reduce hitchance with damage override", &rage->reduce_hitchance_damage_override );
                 } 
             }
 
@@ -542,7 +543,6 @@ void Gui::Render( ) noexcept {
                 if ( rage->reduce_hitchance ) {
                     SliderInt( "Reduced hitchance", &rage->reduce_hitchance_value, 0, 100 );
                     SliderInt( "Period to wait until reducing", &rage->reduce_hitchance_delay, 0.f, 250.f );
-                    ImGui::Checkbox( "Reduce hitchance with damage override", &rage->reduce_hitchance_damage_override );
                 }
 
                 std::vector<MultiItem_t> autostopflags{
