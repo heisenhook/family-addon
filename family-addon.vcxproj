@@ -172,6 +172,7 @@
     <ClInclude Include="glow.h" />
     <ClInclude Include="hash.h" />
     <ClInclude Include="hud.h" />
+    <ClInclude Include="hvh.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="interfaces.h" />
     <ClInclude Include="keybind.h" />
@@ -256,6 +257,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="csgo.cpp" />
+    <ClCompile Include="hvh.cpp" />
     <ClCompile Include="memory2.cpp" />
     <ClCompile Include="buffer.c" />
     <ClCompile Include="client.cpp" />

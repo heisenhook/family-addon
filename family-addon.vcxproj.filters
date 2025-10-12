@@ -348,6 +348,9 @@
     <ClInclude Include="resolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="hvh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -417,6 +420,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="resolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hvh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
