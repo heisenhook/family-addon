@@ -380,7 +380,7 @@ void Gui::Render( ) noexcept {
 
 	ImGui::BeginChild( "tabs", ImVec2{ 150, 0 }, true );
 	{
-		static constexpr const char* tabs[ ]{ "Rage", "Anti-Aim", "Legit", "Visuals", "Misc", "Config" };
+		static constexpr const char* tabs[ ]{ "Aimbot", "Anti-Aim", "Players", "Visuals", "Movement", "Misc", "Config" };
 
 		for ( std::size_t i{ }; i < IM_ARRAYSIZE( tabs ); ++i ) {
 			if ( ImGui::Selectable( tabs[ i ], selected_tab == i ) ) {
@@ -390,6 +390,7 @@ void Gui::Render( ) noexcept {
 	}
 	ImGui::EndChild( );
 
+    // aimbot
     if ( selected_tab == 0 ) {
         static int weapon_config_selection = 0;
         CVariables::RAGE* rage = &g_Vars.rage_default; // todo: add in weapon check functionality
@@ -564,6 +565,7 @@ void Gui::Render( ) noexcept {
         ImGui::EndChild( );
     }
 
+    // anti-aim
     if ( selected_tab == 1 ) {
         ImGui::SetNextWindowPos( calculateChildWindowPosition( 0, 1 ) );
         ImGui::BeginChild( "Anti-Aim", childSize( 0, 1 ), true );
@@ -587,11 +589,8 @@ void Gui::Render( ) noexcept {
         ImGui::EndChild( );
     }
 
+    // players
     if ( selected_tab == 2 ) {
-
-    }
-
-    if ( selected_tab == 3 ) {
         ImGui::SetNextWindowPos( calculateChildWindowPosition( 0, 1 ) );
         ImGui::BeginChild( "Players", childSize( 0, 1, 1.f ), true );
         {
@@ -607,11 +606,26 @@ void Gui::Render( ) noexcept {
         ImGui::EndChild( );
     }
 
+    // visuals
+    if ( selected_tab == 3 ) {
+
+    }
+    
+    // movement
+    if ( selected_tab == 4 ) {
+
+    }
+
+    // misc
     if ( selected_tab == 4 ) {
         ImGui::SetNextWindowPos( calculateChildWindowPosition( 0, 1 ) );
         ImGui::BeginChild( "Miscellaneous", childSize( 0, 1 ), true );
         {
             ImGui::Checkbox( "Disable adaptive weapons", &g_Vars.misc.disable_adaptive_weapons );
+            if ( ImGui::Checkbox( "Disable adaptive weapons", &g_Vars.misc.disable_adaptive_weapons ) ) {
+
+            }
+
 
             if ( g_cl.m_local ) {
                 int wpn = g_cl.m_local->GetActiveWeapon( )->m_iItemDefinitionIndex( );
@@ -633,6 +647,7 @@ void Gui::Render( ) noexcept {
         ImGui::EndChild( );
     }
 
+    // config
     if ( selected_tab == 5 ) {
         static std::vector<std::string> CFG_LIST;
         static bool INITIALISE_CONFIGS = true;
