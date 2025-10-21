@@ -612,9 +612,6 @@ void Gui::Render( ) noexcept {
         ImGui::BeginChild( "Miscellaneous", childSize( 0, 1 ), true );
         {
             ImGui::Checkbox( "Disable adaptive weapons", &g_Vars.misc.disable_adaptive_weapons );
-            ImGui::Checkbox( "sex1", &g_Vars.misc.sex1 );
-            ImGui::Checkbox( "sex2", &g_Vars.misc.sex2 );
-            ImGui::Checkbox( "sex3", &g_Vars.misc.sex3 );
 
             if ( g_cl.m_local ) {
                 int wpn = g_cl.m_local->GetActiveWeapon( )->m_iItemDefinitionIndex( );
